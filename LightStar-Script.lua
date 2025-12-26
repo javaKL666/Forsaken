@@ -1,16 +1,8 @@
--- by TheHunterSolo1
-
-
-
-
---加载动画
-local Compkiller = loadstring(game:HttpGet("https://raw.githubusercontent.com/4lpaca-pin/CompKiller/refs/heads/main/src/source.luau"))();
-Compkiller:Loader("rbxassetid://97914301936069", 2.5).yield();
-
+-- by javaKL
 
 
       
-      
+loadstring(game:HttpGet('https://pastebin.com/raw/CZ2SVCEp'))()       
       
  
  
@@ -25,7 +17,7 @@ local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
-Library:Notify("Loading LightStar for Forsaken",5)
+Library:Notify("Loading LightStar for Forsaken",5,4590657391)
 
 local function Notify(Title, Text, Duration)
     Library:Notify({
@@ -39,6 +31,7 @@ _G._Notify = Notify
 local Options = Library.Options
 local Toggles = Library.Toggles
 
+-- 准备就读
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 local Players = game:GetService("Players")
@@ -50,15 +43,6 @@ local replicatedStorage = game:GetService("ReplicatedStorage")
 local Network = replicatedStorage:WaitForChild("Modules"):WaitForChild("Network")
 local gameMap = workspace.Map
 
-
-if not table.clone then
-    table.clone = function(t)
-        local nt = {}
-        for k,v in pairs(t) do nt[k] = v end
-        return nt
-    end
-end
-
 Library.ShowToggleFrameInKeybinds = true 
 Library.ShowCustomCursor = true
 Library.NotifySide = "Right"
@@ -68,7 +52,7 @@ local Window = Library:CreateWindow({
 	Footer = "by TheHunterSolo1",
 	Icon = 97914301936069,
 	NotifySide = "Right",
-	ShowCustomCursor = true,
+	ShowCustomCursor = false,
 	Center = true,
     AutoShow = true,
     Resizable = true,
@@ -79,18 +63,18 @@ local Window = Library:CreateWindow({
 
 -- housep
 local Tabs = {
-    new = Window:AddTab('公告','external-link','公告&信息'),
+    new = Window:AddTab('公告&主持','external-link','公告&信息'),
     Main = Window:AddTab('玩家','user','修改&篡改'),
     Aimbot = Window:AddTab('自瞄','mouse','让你自瞄的更准!!!'),
-    Esp = Window:AddTab('绘制','eye','让你能够透视他们!!!'),
-    tzq = Window:AddTab('通知提示','eye','让你帮助你监听杀手!!!'),
-    tfz = Window:AddTab('战斗&杀戮','moon','让变得打击更轻松!!!'),
-    ani = Window:AddTab('反效果','ban','让你无法受到效果!!!'),
-    Max = Window:AddTab('动作','file','让你在别人面前动作炫酷!!!'),
-    Sat = Window:AddTab('体力','zap','让你奔跑体力最大!!!'),
-    zdx = Window:AddTab('发动机','star','让你修发动机更快!!!'),
-    lol = Window:AddTab('披萨','pencil','让你快速吃到披萨!!!'),
-    ["UI Settings"] = Window:AddTab("设置","settings",'设置&调试'),
+    Esp = Window:AddTab('ESP','eye','让你能够透视他们!!!'),
+    NotificationListen = Window:AddTab('通知提示','eye','让你帮助你监听杀手!!!'),
+    FightingKilling = Window:AddTab('战斗&杀戮','swords','让变得打击更轻松!!!'),
+    BanEffect = Window:AddTab('反效果','ban','让你无法受到效果!!!'),
+    AnimationAction = Window:AddTab('动作','file','让你在别人面前动作炫酷!!!'),
+    PhysicalStrength = Window:AddTab('体力','zap','让你奔跑体力最大!!!'),
+    Generator = Window:AddTab('发动机','star','让你修发动机更快!!!'),
+    Pizza = Window:AddTab('披萨','pencil','让你快速吃到披萨!!!'),
+    ["UI Settings"] = Window:AddTab("GUI","settings",'设置&调试'),
 }
 
 local _env = getgenv and getgenv() or {}
@@ -214,11 +198,29 @@ KillerSurvival:AddToggle("SB",{
             task.wait()
         end
     end
-}):AddKeyPicker("AimKeyPicker", {
-    Text = "启用速度",
-    Default = "C",
-    Mode = "Toggle",
-    SyncToggleState = true,
+})
+
+KillerSurvival:AddToggle("AllowJump", {
+    Text = "启用跳跃",
+    Default = false,
+    Callback = function (state)
+        _G.AllowJump = state
+
+        if state then
+            Notify("LightStar｜警告", "反复跳跃会踢你 因为游戏会认为你正在飞行！", 9)
+        end
+
+        task.spawn(function ()
+            while task.wait() do
+                if not _G.AllowJump then break end
+                local humanoid = localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid")
+
+                if humanoid then
+                    humanoid.JumpPower = 50
+                end
+            end
+        end)
+    end
 })
 
 local cachedParts = {}
@@ -237,6 +239,7 @@ function disableNoclip()
         v.CanCollide = true
     end
 end
+
 KillerSurvival:AddToggle("EnableNoclip", {
     Text = "穿墙",
     Default = false,
@@ -255,22 +258,27 @@ KillerSurvival:AddToggle("EnableNoclip", {
     end
 })
 
-KillerSurvival:AddToggle('MyToggle', {
-    Text = '显示聊天框',
-    Default = false,
-    Tooltip = '显示聊天框',
-    Callback = function(state)
-    if state then
-    game.TextChatService.ChatWindowConfiguration.Enabled = true
-    else
-    game.TextChatService.ChatWindowConfiguration.Enabled = false    
-    end
-    end
-})
+KillerSurvival:AddToggle('AlwaysShowChat', {
+        Text = "显示聊天框",
+        Callback = function(state)
+            if state then
+                _G.showChat = true
+                task.spawn(function()
+                    while _G.showChat and task.wait() do                        game:GetService("TextChatService"):FindFirstChildOfClass("ChatWindowConfiguration").Enabled = true
+                    end
+                end)
+            else
+                _G.showChat = false
+                if playingState ~= "Spectating" then                   game:GetService("TextChatService"):FindFirstChildOfClass("ChatWindowConfiguration").Enabled = false
+                end
+            end
+        end
+    })
 
 local loopRunning, loopThread, currentAnim, lastAnim
 local anim = Instance.new("Animation")
 anim.AnimationId = "rbxassetid://75804462760596"
+
 KillerSurvival:AddToggle("Invis", {
     Text = "隐身",
     Default = false,
@@ -336,12 +344,115 @@ KillerSurvival:AddToggle("Invis", {
             end
         end
     end
-}):AddKeyPicker("KeyPicker", {
-    Text = "隐身",
-    Default = "G",
-    Mode = "Toggle",
-    SyncToggleState = true,
 })
+
+
+
+
+
+
+
+
+
+
+
+local SM = Tabs.Main:AddLeftGroupbox('TweTime背刺')
+
+
+
+
+
+function hasNotification(text)
+    for i, v in pairs(localPlayer.PlayerGui.Notis:GetChildren()) do
+        if string.find(v.Text:lower(), text) then
+            return true
+        end
+    end
+end
+local function backstab(model)
+    if not model then
+        return
+    else
+        local stabbing = tick()
+        local oldCf = localPlayer.Character.HumanoidRootPart.CFrame
+        task.spawn(function()
+            task.wait(0.2)
+            Network:WaitForChild("RemoteEvent"):FireServer("UseActorAbility", {buffer.fromstring("\"Dagger\"")})
+        end)
+        repeat
+            localPlayer.Character.HumanoidRootPart.CFrame = model.HumanoidRootPart.CFrame - (model.HumanoidRootPart.CFrame.LookVector * 1)
+            task.wait()
+        until (tick() - stabbing >= 3.5) or hasNotification("stab")
+        task.wait(0.5)
+        localPlayer.Character.HumanoidRootPart.CFrame = oldCf
+    end
+end
+local function backstabClose(model)
+    if not model then
+        return
+    else
+        if (localPlayer.Character.HumanoidRootPart.Position - model.HumanoidRootPart.Position).magnitude <= Options.BackstabRange.Value then
+            backstab(model)
+        end
+    end
+end
+
+SM:AddToggle("AutoDagger", {
+    Text = "自动背刺",
+    Default = false,
+    Callback = function(cool)
+        task.spawn(function()
+            while Toggles.AutoDagger.Value and task.wait(0.1) do
+                if hasAbilityReady("Dagger") and isSurvivor then
+                    local suc, res = pcall(backstab, killerModel)
+                    if not suc then
+                        warn("error when backstabbing:", res)
+                    end
+                end
+            end
+        end)
+    end
+})
+SM:AddToggle("DaggerAura", {
+    Text = "背刺光环",
+    Default = false,
+    Callback = function(cool)
+        task.spawn(function()
+            while Toggles.DaggerAura.Value and task.wait(0.1) do
+                if not Toggles.AutoDagger.Value and hasAbilityReady("Dagger") and isSurvivor then
+                    local suc, res = pcall(backstabClose, killerModel)
+                    if not suc then
+                        warn("error when backstabbing near killer:", res)
+                    end
+                end
+            end
+        end)
+    end
+})
+
+
+SM:AddSlider("BackstabRange", {
+    Text = "背刺光环范围",
+    Default = 20,
+    Min = 7,
+    Max = 99,
+    Rounding = 0
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -355,6 +466,12 @@ KillerSurvival:AddToggle("Invis", {
 local MainTabbox = Tabs.Main:AddRightTabbox()
 local Camera = MainTabbox:AddTab("相机")
 
+Camera:AddToggle('IZD', {
+    Text = "自由缩放",
+    Callback = function(state)
+        localPlayer.CameraMaxZoomDistance = state and math.huge or 12
+    end
+})
 
 Camera:AddToggle('IZD', {
     Text = "相机穿墙",
@@ -381,176 +498,133 @@ Camera:AddToggle("SpectateKiller", {
 })
 
 
-local LightStar = Tabs.Main:AddLeftGroupbox("服务器")
 
-LightStar:AddToggle("服务器位置", {
-    Text = "显示你在服务器上的位置",
-    Default = false,
-    Callback = function()
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local player = Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoidRootPart = character:WaitForChild("HumanoidRootPart")
 
--- 创建霓虹跟随者模型
-local neonModel = Instance.new("Model")
-neonModel.Name = player.Name.."_NeonFollower"
-neonModel.Parent = workspace
 
--- 创建R6标准部件函数
-local function createR6Part(name, size, offset)
-    local part = Instance.new("Part")
-    part.Name = name
-    part.Shape = Enum.PartType.Block
-    part.Size = size
-    part.Material = Enum.Material.ForceField
-    part.Color = Color3.fromRGB(255, 0, 0)
-    part.Transparency = 0.5
-    part.CanCollide = false
-    part.Anchored = true
-    part.TopSurface = Enum.SurfaceType.Smooth
-    part.BottomSurface = Enum.SurfaceType.Smooth
-    part.Parent = neonModel
-    return part, offset
-end
 
--- 创建并组装部件
-local parts = {}
-parts.torso, parts.torsoOffset = createR6Part("Torso", Vector3.new(2, 2, 1), CFrame.new(0,0,0))
-parts.head, parts.headOffset = createR6Part("Head", Vector3.new(1, 1, 1), CFrame.new(0, 1.5, 0))
-parts.leftArm, parts.leftArmOffset = createR6Part("Left Arm", Vector3.new(1, 2, 1), CFrame.new(-1.5, 0, 0))
-parts.rightArm, parts.rightArmOffset = createR6Part("Right Arm", Vector3.new(1, 2, 1), CFrame.new(1.5, 0, 0))
-parts.leftLeg, parts.leftLegOffset = createR6Part("Left Leg", Vector3.new(1, 2, 1), CFrame.new(-0.5, -2, 0))
-parts.rightLeg, parts.rightLegOffset = createR6Part("Right Leg", Vector3.new(1, 2, 1), CFrame.new(0.5, -2, 0))
 
--- 初始位置
-local baseCFrame = humanoidRootPart.CFrame
-for name, part in pairs(parts) do
-    if type(part) == "Instance" then
-        part.CFrame = baseCFrame * parts[name .. "Offset"]
-    end
-end
+local Lighting = MainTabbox:AddTab("亮度")
 
--- 位置历史记录
-local positionHistory = {}
-local maxHistoryLength = 20
-local replaySpeed = 0.5
-for i = 1, maxHistoryLength do positionHistory[i] = baseCFrame end
-
--- 动画参数
-local walkCycle = 0
-local walkSpeed = 12
-
--- 官方R6动画偏移
-local function getOfficialR6Offsets(cycle)
-    local sin = math.sin(cycle)
-    local cos = math.cos(cycle)
-    return {
-        head = CFrame.new(0, 0, 0),
-        torso = CFrame.new(0, cos * 0.05, 0),
-        leftArm = CFrame.Angles(sin * math.rad(30), 0, 0),
-        rightArm = CFrame.Angles(-sin * math.rad(30), 0, 0),
-        leftLeg = CFrame.Angles(-sin * math.rad(35), 0, 0),
-        rightLeg = CFrame.Angles(sin * math.rad(35), 0, 0)
-    }
-end
-
-local connection
-connection = RunService.Heartbeat:Connect(function(deltaTime)
-    if not character or not character.Parent then
-        connection:Disconnect()
-        neonModel:Destroy()
-        return
-    end
-
-    -- 更新位置历史
-    table.insert(positionHistory, 1, humanoidRootPart.CFrame)
-    if #positionHistory > maxHistoryLength then table.remove(positionHistory) end
-
-    -- 计算延迟位置
-    local replayIndex = math.clamp(math.floor(#positionHistory * replaySpeed), 1, #positionHistory)
-    local targetCFrame = positionHistory[replayIndex]
-
-    -- 平滑移动 torso
-    local currentCFrame = parts.torso.CFrame
-    local lerpFactor = math.min(10 * deltaTime, 1)
-    local newPosition = currentCFrame.Position:Lerp(targetCFrame.Position, lerpFactor)
-    local newRotation = currentCFrame.Rotation:Lerp(targetCFrame.Rotation, lerpFactor)
-    local newTorsoCFrame = CFrame.new(newPosition) * newRotation
-    parts.torso.CFrame = newTorsoCFrame
-
-    -- 检测移动
-    local humanoid = character:FindFirstChildOfClass("Humanoid")
-    local isMoving = humanoid and humanoid.MoveDirection.Magnitude > 0
-    
-    -- 更新走路周期
-    if isMoving then
-        walkCycle = (walkCycle + deltaTime * walkSpeed) % (math.pi * 2)
-    else
-        walkCycle = walkCycle * (1 - deltaTime * 5)
-        if math.abs(walkCycle) < 0.01 then walkCycle = 0 end
-    end
-
-    -- 获取偏移
-    local offsets = getOfficialR6Offsets(walkCycle)
-    
-    -- 应用动画
-    for name, part in pairs(parts) do
-        if type(part) == "Instance" then
-            local offsetName = name
-            part.CFrame = newTorsoCFrame * parts[name .. "Offset"] * offsets[offsetName]
-        end
-    end
-end)
+Lighting:AddSlider("B",{
+    Text = "亮度数值",
+    Min = 0,
+    Default = 0,
+    Max = 3,
+    Rounding = 1,
+    Compact = true,
+    Callback = function(v)
+        _env.Brightness = v
     end
 })
 
-LightStar:AddButton({
-    Text = "换服务器", 
-    Func = function()
-        local TeleportService = game:GetService("TeleportService")
-        local Players = game:GetService("Players")
-        local HttpService = game:GetService("HttpService")
-        
-        local requestFunc = http_request or syn.request or request
-        if not requestFunc then return end
-            
-        local url = "https://games.roblox.com/v1/games/"..game.PlaceId.."/servers/Public?sortOrder=Asc&limit=100"
-        local response = requestFunc({Url = url, Method = "GET"})
-        
-        if response.StatusCode == 200 then
-            local data = HttpService:JSONDecode(response.Body)
-            if data and data.data and #data.data > 0 then
-                TeleportService:TeleportToPlaceInstance(game.PlaceId, data.data[math.random(1, #data.data)].id, Players.LocalPlayer)
+Lighting:AddToggle("无阴影",{
+    Text = "无阴影",
+    Default = false,
+    Callback = function(v)
+        _env.GlobalShadows = v
+    end
+})
+
+Lighting:AddToggle("除雾",{
+    Text = "除雾",
+    Default = false,
+    Callback = function(v)
+        _env.NoFog = v
+    end
+})
+
+Lighting:AddDivider()
+
+Lighting:AddToggle("启用功能",{
+    Text = "启用",
+    Default = false,
+    Callback = function(v)
+        _env.Fullbright = v
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if not game.Lighting:GetAttribute("FogStart") then 
+                game.Lighting:SetAttribute("FogStart", game.Lighting.FogStart) 
             end
-        end
-    end
-})
-
-
-local ZZ = Tabs.Main:AddRightGroupbox('自动')
-
-ZZ:AddToggle('自动投硬', {
-    Text = 'Chance自动投硬币',
-    Default = false,
-    Tooltip = '自动使用硬币投能力',
-    
-    Callback = function(state)
-        _G.AutoFlipCoins = state
-        
-        if _G.AutoFlipCoins then
-            flipCoinsThread = task.spawn(function()
-                while _G.AutoFlipCoins and task.wait() do
-                    game:GetService("ReplicatedStorage"):WaitForChild("Modules"):WaitForChild("Network"):WaitForChild("RemoteEvent"):FireServer("UseActorAbility", "CoinFlip")
+            if not game.Lighting:GetAttribute("FogEnd") then 
+                game.Lighting:SetAttribute("FogEnd", game.Lighting.FogEnd) 
+            end
+            game.Lighting.FogStart = _env.NoFog and 0 or game.Lighting:GetAttribute("FogStart")
+            game.Lighting.FogEnd = _env.NoFog and math.huge or game.Lighting:GetAttribute("FogEnd")
+            
+            local fog = game.Lighting:FindFirstChildOfClass("Atmosphere")
+            if fog then
+                if not fog:GetAttribute("Density") then 
+                    fog:SetAttribute("Density", fog.Density) 
                 end
+                fog.Density = _env.NoFog and 0 or fog:GetAttribute("Density")
+            end
+            
+            if _env.Fullbright then
+                game.Lighting.OutdoorAmbient = Color3.new(1,1,1)
+                game.Lighting.Brightness = _env.Brightness or 0
+                game.Lighting.GlobalShadows = not _env.GlobalShadows
+            else
+                game.Lighting.OutdoorAmbient = Color3.fromRGB(55,55,55)
+                game.Lighting.Brightness = 0
+                game.Lighting.GlobalShadows = true
+            end
+        end)
+    end
+    
+})
+
+
+
+
+
+
+
+
+
+
+
+local Telephone = Tabs.Main:AddRightGroupbox('传送')
+
+
+
+
+
+Telephone:AddButton({
+    Text = "传送杀手",
+    Func = function ()
+        if playingState == "Spectating" then
+            return Notify("LightStar｜提示", "必须在一轮 窥视时无法使用此功能", 7)
+        end
+
+        local killer = workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild("Killers") and workspace.Players.Killers:GetChildren()[1]
+        if killer then
+            pcall(function()
+                localPlayer.Character.HumanoidRootPart.CFrame = killer.PrimaryPart.CFrame
             end)
-        elseif flipCoinsThread then
-            task.cancel(flipCoinsThread)
-            flipCoinsThread = nil
         end
     end
 })
+
+Telephone:AddButton({
+    Text = "传送随机幸存者",
+    Func = function()
+        if playingState == "Spectating" then
+            return Notify("LightStar｜提示", "必须在一轮 窥视时无法使用此功能", 7)
+        end
+        pcall(function()
+            if not (workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild("Survivors")) then return end
+            local survs = workspace.Players.Survivors:GetChildren()
+            if #survs == 0 then return end
+
+            localPlayer.Character.HumanoidRootPart.CFrame = survs[math.random(1, #survs)].HumanoidRootPart.CFrame
+        end)
+    end
+})
+
+
+
+
+
+
 
 
 
@@ -648,75 +722,6 @@ ZZ:AddButton({
             end
         end)
     end
-})
-
-local Lighting = MainTabbox:AddTab("亮度")
-
-Lighting:AddSlider("B",{
-    Text = "亮度数值",
-    Min = 0,
-    Default = 0,
-    Max = 3,
-    Rounding = 1,
-    Compact = true,
-    Callback = function(v)
-        _env.Brightness = v
-    end
-})
-
-Lighting:AddToggle("无阴影",{
-    Text = "无阴影",
-    Default = false,
-    Callback = function(v)
-        _env.GlobalShadows = v
-    end
-})
-
-Lighting:AddToggle("除雾",{
-    Text = "除雾",
-    Default = false,
-    Callback = function(v)
-        _env.NoFog = v
-    end
-})
-
-Lighting:AddDivider()
-
-Lighting:AddToggle("启用功能",{
-    Text = "启用",
-    Default = false,
-    Callback = function(v)
-        _env.Fullbright = v
-        game:GetService("RunService").RenderStepped:Connect(function()
-            if not game.Lighting:GetAttribute("FogStart") then 
-                game.Lighting:SetAttribute("FogStart", game.Lighting.FogStart) 
-            end
-            if not game.Lighting:GetAttribute("FogEnd") then 
-                game.Lighting:SetAttribute("FogEnd", game.Lighting.FogEnd) 
-            end
-            game.Lighting.FogStart = _env.NoFog and 0 or game.Lighting:GetAttribute("FogStart")
-            game.Lighting.FogEnd = _env.NoFog and math.huge or game.Lighting:GetAttribute("FogEnd")
-            
-            local fog = game.Lighting:FindFirstChildOfClass("Atmosphere")
-            if fog then
-                if not fog:GetAttribute("Density") then 
-                    fog:SetAttribute("Density", fog.Density) 
-                end
-                fog.Density = _env.NoFog and 0 or fog:GetAttribute("Density")
-            end
-            
-            if _env.Fullbright then
-                game.Lighting.OutdoorAmbient = Color3.new(1,1,1)
-                game.Lighting.Brightness = _env.Brightness or 0
-                game.Lighting.GlobalShadows = not _env.GlobalShadows
-            else
-                game.Lighting.OutdoorAmbient = Color3.fromRGB(55,55,55)
-                game.Lighting.Brightness = 0
-                game.Lighting.GlobalShadows = true
-            end
-        end)
-    end
-    
 })
 
 local Size = 5
@@ -912,7 +917,7 @@ local function shedletskyAimbot(state)
     shedaim = state
     if state then
         if game:GetService("Players").LocalPlayer.Character.Name ~= "Shedletsky" then
-            Library:Notify("你用的角色不是谢德利茨基 无法生效", nil, 4590657391)
+            Library:Notify("你的角色不是谢德利茨基 无法生效", nil, 4590657391)
             return
         end
         
@@ -1298,21 +1303,18 @@ end
 SB:AddToggle('MyToggle', {
     Text = 'Chance 自瞄 ',
     Default = false,
-    Tooltip = '自瞄',
     Callback = chanceAimbot
 })
 
 SB:AddToggle('MyToggle', {
     Text = 'TwoTime 自瞄',
     Default = false,
-    Tooltip = '自瞄',
     Callback = TWO
 })
 
 SB:AddToggle('MyToggle', {
     Text = '谢德利茨基 自瞄',
     Default = false,
-    Tooltip = '自瞄',
     Callback = shedletskyAimbot
 })
 
@@ -1320,28 +1322,24 @@ SB:AddToggle('MyToggle', {
 SC:AddToggle('MyToggle', {
     Text = '1x4自瞄',
     Default = false,
-    Tooltip = '自瞄',
     Callback = aimbot1x1x1x1
 })
 
 SC:AddToggle('MyToggle', {
     Text = '酷小孩自瞄',
     Default = false,
-    Tooltip = '自瞄',
     Callback = cool
 })
 
 SC:AddToggle('MyToggle', {
     Text = '约翰 多自瞄',
     Default = false,
-    Tooltip = '自瞄',
     Callback = johnaimbot
 })
 
 SC:AddToggle('MyToggle', {
     Text = '杰森自瞄',
     Default = false,
-    Tooltip = '自瞄',
     Callback = jasonaimbot
 })
 
@@ -2016,9 +2014,9 @@ ZZ:AddToggle("AimbotToggle", {
 
 
 
-local Visual = Tabs.Esp:AddRightGroupbox("高亮绘制")
+local Visual = Tabs.Esp:AddRightGroupbox("高亮ESP")
 
--- 高亮绘制设置
+-- 高亮ESP设置
 local HighlightSettings = {
     ShowSurvivorHighlights = true,
     ShowKillerHighlights = true,
@@ -2129,7 +2127,7 @@ end
 
 -- 主开关
 Visual:AddToggle("HighlightToggle", {
-    Text = "启用高亮绘制",
+    Text = "启用高亮ESP",
     Default = false,
     Callback = function(enabled)
         if enabled then
@@ -2151,7 +2149,7 @@ Visual:AddToggle("HighlightToggle", {
 
 -- 幸存者开关
 Visual:AddToggle("ShowSurvivorHighlights", {
-    Text = "绘制幸存者高亮",
+    Text = "ESP幸存者高亮",
     Default = true,
     Callback = function(enabled)
         HighlightSettings.ShowSurvivorHighlights = enabled
@@ -2160,7 +2158,7 @@ Visual:AddToggle("ShowSurvivorHighlights", {
 
 -- 杀手开关
 Visual:AddToggle("ShowKillerHighlights", {
-    Text = "绘制杀手高亮",
+    Text = "ESP杀手高亮",
     Default = true,
     Callback = function(enabled)
         HighlightSettings.ShowKillerHighlights = enabled
@@ -2238,7 +2236,9 @@ Visual:AddSlider("OutlineTransparency", {
 
 
 
-local Visual = Tabs.Esp:AddRightGroupbox("假Noli绘制")
+
+
+local Visual = Tabs.Esp:AddRightGroupbox("假NoliESP")
 
 
 
@@ -2339,7 +2339,7 @@ local function updateHighlights()
 end
 
 Visual:AddToggle("NoliHighlightToggle", {
-    Text = "假Noli绘制",
+    Text = "假NoliESP",
     Default = false,
     Callback = function(enabled)
         NoliHighlight.Enabled = enabled
@@ -2382,7 +2382,7 @@ Visual:AddSlider("NoliOutlineTransparency", {
 })
 
 
-local Visual = Tabs.Esp:AddLeftGroupbox("角色名称绘制")
+local Visual = Tabs.Esp:AddLeftGroupbox("角色名称ESP")
 
 local NameTagSettings = {
     ShowSurvivorNames = true,
@@ -2573,7 +2573,7 @@ local function cleanupNameTags()
 end
 
 Visual:AddToggle("NameTagsToggle", {
-    Text = "启用角色名称绘制",
+    Text = "启用角色名称ESP",
     Default = false,
     Callback = function(enabled)
         if enabled then
@@ -2634,7 +2634,7 @@ Visual:AddToggle("ShowDistance", {
 
 
 
-local Visual = Tabs.Esp:AddLeftGroupbox("血量条绘制")
+local Visual = Tabs.Esp:AddLeftGroupbox("血量条ESP")
 
 -- 血量条设置
 local HealthBarSettings = {
@@ -2666,10 +2666,10 @@ local ColorPresets = {
     }
 }
 
--- 存储所有绘制对象
+-- 存储所有ESP对象
 local HealthBarDrawings = {}
 
--- 创建血量条绘制对象
+-- 创建血量条ESP对象
 local function createHealthBarDrawing()
     local drawing = {
         background = Drawing.new("Square"),
@@ -2741,7 +2741,7 @@ local function updateHealthBars()
                     local head = survivor:FindFirstChild("Head")
                     
                     if humanoid and head then
-                        -- 获取或创建绘制对象
+                        -- 获取或创建ESP对象
                         if not HealthBarDrawings[survivor] then
                             HealthBarDrawings[survivor] = createHealthBarDrawing()
                         end
@@ -2805,7 +2805,7 @@ local function updateHealthBars()
                     local head = killer:FindFirstChild("Head")
                     
                     if humanoid and head then
-                        -- 获取或创建绘制对象
+                        -- 获取或创建ESP对象
                         if not HealthBarDrawings[killer] then
                             HealthBarDrawings[killer] = createHealthBarDrawing()
                         end
@@ -2906,7 +2906,7 @@ Visual:AddToggle("HealthBarsToggle", {
                 HealthBarSettings.removedConnection = nil
             end
             
-            -- 清理绘制对象
+            -- 清理ESP对象
             cleanupHealthBars()
         end
     end
@@ -2981,14 +2981,17 @@ Visual:AddSlider("BarOffsetY", {
 
 
 
-Visual = Tabs.Esp:AddLeftGroupbox("血量绘制[备用]")
+
+
+
+Visual = Tabs.Esp:AddLeftGroupbox("血量ESP[备用]")
 
 
 local camera = workspace.CurrentCamera
 local localPlayer = game:GetService("Players").LocalPlayer
 
 Visual:AddToggle("SurvivorHealth", {
-    Text = "绘制幸存者血量(文字)",
+    Text = "ESP幸存者血量(文字)",
     Default = false,
     Callback = function(v)
         if v then
@@ -3070,7 +3073,7 @@ Visual:AddToggle("SurvivorHealth", {
 })
 
 Visual:AddToggle("KillerHealth", {
-    Text = "绘制杀手血量(文字)",
+    Text = "ESP杀手血量(文字)",
     Default = false,
     Callback = function(v)
         if v then
@@ -3155,10 +3158,10 @@ Visual:AddToggle("KillerHealth", {
 
 
 
-local Visual   = Tabs.Esp:AddLeftGroupbox('电机绘制')
--- 真电机ESP
+local Visual   = Tabs.Esp:AddLeftGroupbox('发动机ESP')
+-- 真发动机ESP
 Visual:AddToggle("RealGeneratorESP", {
-    Text = "绘制真电机",
+    Text = "ESP真发动机",
     Default = false,
     Callback = function(enabled)
         if not _G.RealGeneratorESP then
@@ -3233,7 +3236,7 @@ Visual:AddToggle("RealGeneratorESP", {
                 end
                 
                 if data.TextLabel then
-                    data.TextLabel.Text = string.format("真电机: %d%%", progress)
+                    data.TextLabel.Text = string.format("真发动机: %d%%", progress)
                 end
                 
                 local character = game:GetService("Players").LocalPlayer.Character
@@ -3311,7 +3314,7 @@ Visual:AddToggle("RealGeneratorESP", {
             textLabel.Size = UDim2.new(1, 0, 0.5, 0)
             textLabel.BackgroundTransparency = 1
             textLabel.TextScaled = false
-            textLabel.Text = "真电机加载中..."
+            textLabel.Text = "真发动机加载中..."
             textLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- 绿色
             textLabel.Font = Enum.Font.Arcade
             textLabel.TextStrokeTransparency = 0
@@ -3458,9 +3461,9 @@ Visual:AddToggle("RealGeneratorESP", {
     end
 })
 
--- 假电机ESP
+-- 假发动机ESP
 Visual:AddToggle("FakeGeneratorESP", {
-    Text = "绘制假电机",
+    Text = "ESP假发动机",
     Default = false,
     Callback = function(enabled)
         if not _G.FakeGeneratorESP then
@@ -3534,7 +3537,7 @@ Visual:AddToggle("FakeGeneratorESP", {
             nameLabel.Size = UDim2.new(1, 0, 1, 0)
             nameLabel.BackgroundTransparency = 1
             nameLabel.TextScaled = false
-            nameLabel.Text = "假电机"
+            nameLabel.Text = "假发动机"
             nameLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
             nameLabel.Font = Enum.Font.Arcade
             nameLabel.TextStrokeTransparency = 0
@@ -3644,9 +3647,9 @@ Visual:AddToggle("FakeGeneratorESP", {
     end
 })
 
--- 特殊电机ESP
+-- 特殊发动机ESP
 Visual:AddToggle("NoliWarningESP", {
-    Text = "绘制Noli传送电机",
+    Text = "ESPNoli传送发动机",
     Default = false,
     Callback = function(enabled)
         if not _G.NoliWarningESP then
@@ -3855,7 +3858,7 @@ local Visual = Tabs.Esp:AddRightGroupbox("2D方框")
 
 
 Visual:AddToggle("SE", {
-    Text = "绘制幸存者方框",
+    Text = "ESP幸存者方框",
     Default = false,
     Callback = function(v)
         if v then
@@ -3929,7 +3932,7 @@ Visual:AddToggle("SE", {
 })
 
 Visual:AddToggle("KE", {
-    Text = "绘制杀手方框",
+    Text = "ESP杀手方框",
     Default = false,
     Callback = function(v)
         if v then
@@ -4004,9 +4007,9 @@ Visual:AddToggle("KE", {
 
 
 
-local Visual = Tabs.Esp:AddRightGroupbox("3D方框绘制")
+local Visual = Tabs.Esp:AddRightGroupbox("3D方框ESP")
 
--- 3D方框绘制设置
+-- 3D方框ESP设置
 local Box3DSettings = {
     -- 基本设置
     Enabled = false,
@@ -4048,10 +4051,10 @@ local Box3DSettings = {
     removedConnection = nil
 }
 
--- 存储所有3D方框绘制对象
+-- 存储所有3D方框ESP对象
 local Box3DDrawings = {}
 
--- 创建3D方框绘制对象
+-- 创建3D方框ESP对象
 local function create3DBoxDrawing()
     local drawing = {
         lines = {},
@@ -4205,7 +4208,7 @@ local function updateSingle3DBox(model, drawing, color, isKiller)
         line.Transparency = Box3DSettings.Transparency
     end
     
-    -- 绘制立方体边线
+    -- ESP立方体边线
     if anyVisible then
         -- 前面4条边
         drawing.lines[1].From = screenVertices[5] drawing.lines[1].To = screenVertices[6] -- 上面前
@@ -4250,7 +4253,7 @@ local function update3DBoxes()
     -- 先隐藏所有现有的方框
     for model, drawing in pairs(Box3DDrawings) do
         if not model or not model.Parent then
-            -- 模型已不存在，清理绘制对象
+            -- 模型已不存在，清理ESP对象
             for _, line in pairs(drawing.lines) do
                 line:Remove()
             end
@@ -4270,7 +4273,7 @@ local function update3DBoxes()
         if survivors then
             for _, survivor in ipairs(survivors:GetChildren()) do
                 if survivor:IsA("Model") and survivor ~= localPlayer.Character then
-                    -- 获取或创建绘制对象
+                    -- 获取或创建ESP对象
                     if not Box3DDrawings[survivor] then
                         Box3DDrawings[survivor] = create3DBoxDrawing()
                     end
@@ -4298,7 +4301,7 @@ local function update3DBoxes()
         if killers then
             for _, killer in ipairs(killers:GetChildren()) do
                 if killer:IsA("Model") and killer ~= localPlayer.Character then
-                    -- 获取或创建绘制对象
+                    -- 获取或创建ESP对象
                     if not Box3DDrawings[killer] then
                         Box3DDrawings[killer] = create3DBoxDrawing()
                     end
@@ -4368,7 +4371,7 @@ Visual:AddToggle("Box3DToggle", {
                 Box3DSettings.removedConnection = nil
             end
             
-            -- 清理绘制对象
+            -- 清理ESP对象
             cleanup3DBoxes()
         end
     end
@@ -4569,12 +4572,12 @@ Visual:AddSlider("FootOffset", {
 
 
 
-local Visual = Tabs.Esp:AddLeftGroupbox("物品绘制")
+local Visual = Tabs.Esp:AddLeftGroupbox("物品ESP")
 
 local LibESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/ImamGV/Script/main/ESP"))()
 
 Visual:AddToggle("EKE",{
-    Text = "杀手机器人绘制",
+    Text = "杀手机器人ESP",
     Callback = function(v)
         if v then
             for _, v in ipairs(workspace:GetDescendants()) do
@@ -4600,7 +4603,7 @@ Visual:AddToggle("EKE",{
 
 
 Visual:AddToggle("TWE",{
-Text = "塔夫绊线绘制",
+Text = "塔夫绊线ESP",
 Default = false,
 Callback = function(v)
 if v then
@@ -4624,7 +4627,7 @@ end})
 
 
 Visual:AddToggle("ST",{
-Text = "空间炸弹绘制",
+Text = "空间炸弹ESP",
 Callback = function(v)
 if v then
 for _, v in ipairs(workspace:GetDescendants()) do
@@ -4643,7 +4646,7 @@ LibESP:Delete("SubspaceTripmine_ESP")
 end
 end})
 Visual:AddToggle("ME",{
-Text = "医疗箱绘制",
+Text = "医疗箱ESP",
 Callback = function(v)
 if v then
 for _, v in ipairs(workspace:GetDescendants()) do
@@ -4662,7 +4665,7 @@ LibESP:Delete("Medkit_ESP")
 end
 end})
 Visual:AddToggle("BCE",{
-Text = "可乐绘制",
+Text = "可乐ESP",
 Callback = function(v)
 if v then
 for _, v in ipairs(workspace:GetDescendants()) do
@@ -4686,7 +4689,7 @@ end})
 
 
 
-local Warning = Tabs.tzq:AddLeftGroupbox("杀手靠近提示")
+local Warning = Tabs.NotificationListen:AddLeftGroupbox("杀手靠近提示")
 
 -- 杀手靠近提示设置
 local KillerWarningSettings = {
@@ -4697,10 +4700,9 @@ local KillerWarningSettings = {
     BlinkInterval = 0.5, -- 闪烁间隔(秒)
     LastWarningTime = 0, -- 上次警告时间
     WarningCooldown = 5, -- 警告冷却时间(秒)
-    SoundVolume = 0.5 -- 音效音量
 }
 
--- 存储绘制对象
+-- 存储ESP对象
 local warningLabel = Drawing.new("Text")
 warningLabel.Visible = false
 warningLabel.Center = true
@@ -4777,7 +4779,6 @@ Warning:AddToggle("KillerWarningToggle", {
                 KillerWarningSettings.connection = nil
             end
             warningLabel.Visible = false
-            warningSound:Stop()
         end
     end
 })
@@ -4838,7 +4839,15 @@ Warning:AddDropdown("WarningColor", {
 })
 
 
-local Visual = Tabs.tzq:AddRightGroupbox("Noli监听")
+
+
+
+
+
+
+
+
+local Visual = Tabs.NotificationListen:AddRightGroupbox("Noli监听")
 
 
 
@@ -4987,11 +4996,11 @@ Visual:AddToggle("NoliTeleportCancel", {
 })
 
 Visual:AddToggle("NoliMotorSelect", {
-    Text = "Noli电机选择提示",
+    Text = "Noli发动机选择提示",
     Default = false,
     Callback = function(v)
         local soundId = "rbxassetid://124468317999247"
-        local notificationMessage = "LightStar｜警告\nNoli正在选择电机"
+        local notificationMessage = "LightStar｜警告\nNoli正在选择发动机"
         local connections = {}
         local cooldown = 2 -- 通知冷却时间(秒)
         local lastNotifyTime = 0
@@ -5143,172 +5152,12 @@ Visual:AddToggle("NoliMotorSelect", {
 
 
 
-local Visual = Tabs.tzq:AddLeftGroupbox('1x4技能监听通知')
 
 
 
 
 
-Visual:AddToggle("NoliMotorSelect", {
-    Text = "1x4缠绕监听",
-    Default = false,
-    Callback = function(v)
-        local soundId = "rbxassetid://101593173978979"
-        local notificationMessage = "LightStar｜警告\n小心缠绕"
-        local endNotificationMessage = "LightStar｜警告\n小心缠绕"
-        local connections = {}
-        local cooldown = 2
-        local lastNotifyTime = 0
-
-        local function disconnectAll()
-            for _, conn in pairs(connections) do
-                conn:Disconnect()
-            end
-            connections = {}
-        end
-
-        local function safeNotify(message)
-            local now = os.time()
-            if now - lastNotifyTime >= cooldown then
-                Library:Notify(message)
-                lastNotifyTime = now
-            end
-        end
-
-        local function setupSoundListener(humanoidRootPart)
-            local function onChildAdded(child)
-                if child:IsA("Sound") and child.SoundId == soundId then
-                    safeNotify(notificationMessage)
-                    local endedConn = child.Ended:Connect(function()
-                        safeNotify(endNotificationMessage)
-                        endedConn:Disconnect()
-                    end)
-                    table.insert(connections, endedConn)
-                end
-            end
-
-            local conn = humanoidRootPart.ChildAdded:Connect(onChildAdded)
-            table.insert(connections, conn)
-
-            for _, child in ipairs(humanoidRootPart:GetChildren()) do
-                if child:IsA("Sound") and child.SoundId == soundId then
-                    safeNotify(notificationMessage)
-                    if child.IsPlaying then
-                        local endedConn = child.Ended:Connect(function()
-                            safeNotify(endNotificationMessage)
-                            endedConn:Disconnect()
-                        end)
-                        table.insert(connections, endedConn)
-                    end
-                    break
-                end
-            end
-        end
-
-        local function onKillerAdded(killer)
-            local humanoidRootPart = killer:FindFirstChild("HumanoidRootPart") or killer:WaitForChild("HumanoidRootPart", 3)
-            if humanoidRootPart then
-                setupSoundListener(humanoidRootPart)
-            end
-        end
-
-        if v then
-            local mainConn = workspace.Players.Killers.ChildAdded:Connect(onKillerAdded)
-            table.insert(connections, mainConn)
-            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
-                task.spawn(onKillerAdded, killer)
-            end
-        else
-            disconnectAll()
-        end
-    end
-})
-
-
-
-
-
-
-
-Visual:AddToggle("NoliMotorSelect", {
-    Text = "1x4大规模监听",
-    Default = false,
-    Callback = function(v)
-        local soundId = "rbxassetid://72296288942160"
-        local notificationMessage = "LightStar｜警告\n小心大规模"
-        local endNotificationMessage = "LightStar｜警告\n小心大规模"
-        local connections = {}
-        local cooldown = 2
-        local lastNotifyTime = 0
-
-        local function disconnectAll()
-            for _, conn in pairs(connections) do
-                conn:Disconnect()
-            end
-            connections = {}
-        end
-
-        local function safeNotify(message)
-            local now = os.time()
-            if now - lastNotifyTime >= cooldown then
-                Library:Notify(message)
-                lastNotifyTime = now
-            end
-        end
-
-        local function setupSoundListener(humanoidRootPart)
-            local function onChildAdded(child)
-                if child:IsA("Sound") and child.SoundId == soundId then
-                    safeNotify(notificationMessage)
-                    local endedConn = child.Ended:Connect(function()
-                        safeNotify(endNotificationMessage)
-                        endedConn:Disconnect()
-                    end)
-                    table.insert(connections, endedConn)
-                end
-            end
-
-            local conn = humanoidRootPart.ChildAdded:Connect(onChildAdded)
-            table.insert(connections, conn)
-
-            for _, child in ipairs(humanoidRootPart:GetChildren()) do
-                if child:IsA("Sound") and child.SoundId == soundId then
-                    safeNotify(notificationMessage)
-                    if child.IsPlaying then
-                        local endedConn = child.Ended:Connect(function()
-                            safeNotify(endNotificationMessage)
-                            endedConn:Disconnect()
-                        end)
-                        table.insert(connections, endedConn)
-                    end
-                    break
-                end
-            end
-        end
-
-        local function onKillerAdded(killer)
-            local humanoidRootPart = killer:FindFirstChild("HumanoidRootPart") or killer:WaitForChild("HumanoidRootPart", 3)
-            if humanoidRootPart then
-                setupSoundListener(humanoidRootPart)
-            end
-        end
-
-        if v then
-            local mainConn = workspace.Players.Killers.ChildAdded:Connect(onKillerAdded)
-            table.insert(connections, mainConn)
-            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
-                task.spawn(onKillerAdded, killer)
-            end
-        else
-            disconnectAll()
-        end
-    end
-})
-
-
-
-
-local Visual = Tabs.tzq:AddRightGroupbox('其他监听')
+local Visual = Tabs.NotificationListen:AddRightGroupbox('其他监听')
 
 
 
@@ -5346,7 +5195,7 @@ NotifyEntityKillers:Disconnect()
 end
 end})
 
-local Player = Tabs.Max:AddLeftGroupbox("动作功能")
+local Player = Tabs.AnimationAction:AddLeftGroupbox("动作功能")
 
 
 Player:AddToggle("SillyBillyToggle", {
@@ -5699,7 +5548,7 @@ Player:AddToggle("MissTheQuietToggle", {
 
 
 
-local Player = Tabs.Max:AddRightGroupbox('VIP舞蹈')
+local Player = Tabs.AnimationAction:AddRightGroupbox('VIP舞蹈')
 
 
 
@@ -5866,7 +5715,7 @@ Player:AddToggle("VIPToggleOld", {
 
 
 
-local Disabled = Tabs.ani:AddLeftGroupbox("约翰 多反效果")
+local Disabled = Tabs.BanEffect:AddLeftGroupbox("约翰 多反效果")
 
 -- Helper function to safely destroy objects
 local function safeDestroy(obj)
@@ -6033,7 +5882,7 @@ Disabled:AddToggle("AJDS", {
 
 
 
-local ZZ = Tabs.ani:AddLeftGroupbox('Noli反效果')
+local ZZ = Tabs.BanEffect:AddLeftGroupbox('Noli反效果')
 
 
 local RunService = game:GetService("RunService")
@@ -6249,7 +6098,7 @@ ZZ:AddToggle("VoidRushOverride", {
 
 
 
-local ZZ = Tabs.ani:AddRightGroupbox('1x4反效果')
+local ZZ = Tabs.BanEffect:AddRightGroupbox('1x4反效果')
 
 
 
@@ -6497,7 +6346,7 @@ ZZ:AddToggle("RemoveBlindness", {
     end
 })
 
-local ZZ = Tabs.ani:AddRightGroupbox('谢德反效果')
+local ZZ = Tabs.BanEffect:AddRightGroupbox('谢德反效果')
 
 ZZ:AddToggle("RemoveStunningKiller", {
     Text = "反谢德出剑缓慢移速", 
@@ -6558,7 +6407,7 @@ ZZ:AddToggle("RemoveStunningKiller", {
 })
 
 
-local ZZ = Tabs.ani:AddRightGroupbox('菜鸟反效果')
+local ZZ = Tabs.BanEffect:AddRightGroupbox('菜鸟反效果')
 
 ZZ:AddToggle("RemoveSlateskin", {
     Text = "反菜鸟石板皮肤缓慢效果", 
@@ -6611,7 +6460,7 @@ ZZ:AddToggle("RemoveSlateskin", {
 
 
 
-local Disabled = Tabs.ani:AddLeftGroupbox('访客反效果')
+local Disabled = Tabs.BanEffect:AddLeftGroupbox('访客反效果')
 -- 1. 反访客冲刺没有击中都缓慢
 Disabled:AddToggle("RemoveSlowed", {
     Text = "反访客冲刺没有击中都缓慢", 
@@ -6807,7 +6656,7 @@ local RunService = game:GetService("RunService")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 -- 创建一个体力功能组
-local MVP = Tabs.Sat:AddLeftGroupbox("体力功能")
+local MVP = Tabs.PhysicalStrength:AddLeftGroupbox("体力功能")
 
 -- 体力系统设置
 local StaminaSettings = {
@@ -6916,7 +6765,7 @@ MVP:AddToggle('SprintSpeedToggle', {
 
 
 
-local MVP = Tabs.Sat:AddRightGroupbox("调试区")
+local MVP = Tabs.PhysicalStrength:AddRightGroupbox("调试区")
 
 
 
@@ -6985,7 +6834,7 @@ MVP:AddSlider('MySlider4', {
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local PZ = Tabs.lol:AddLeftGroupbox("披萨功能")
+local PZ = Tabs.Pizza:AddLeftGroupbox("披萨功能")
 
 local pizzaConnection = nil
 local pizzaTPConnection = nil
@@ -7161,7 +7010,7 @@ PZ:AddButton("InstantAttract", {
     end
 })
 
-local Misc = Tabs.lol:AddRightGroupbox('自动吃披萨［2］')
+local Misc = Tabs.Pizza:AddRightGroupbox('自动吃披萨［2］')
 
 Misc:AddSlider("HealthEatPizza",{
 Text = "生命值",
@@ -7203,7 +7052,7 @@ end})
 
 
 
-local SM = Tabs.tfz:AddLeftGroupbox('杀戮功能[杀手]')
+local SM = Tabs.FightingKilling:AddLeftGroupbox('杀戮功能[杀手]')
 
 
 
@@ -7607,7 +7456,7 @@ SM:AddToggle("打人", {
 
 
 
-local SM = Tabs.tfz:AddLeftGroupbox('自调碰撞箱追踪')
+local SM = Tabs.FightingKilling:AddLeftGroupbox('自调碰撞箱追踪')
 
 SM:AddSlider("DistanceSlider", {
     Text = "距离范围",
@@ -7624,7 +7473,6 @@ SM:AddSlider("DistanceSlider", {
 
 SM:AddToggle("InfiniteJumpToggle", {
     Text = "自调追踪",
-    Tooltip = "启用",
     Default = false,
     Disabled = false,
     Visible = true,
@@ -7815,7 +7663,7 @@ local AttackAnimations = {
 
 
 
-local SM = Tabs.tfz:AddRightGroupbox('碰撞箱追踪')
+local SM = Tabs.FightingKilling:AddRightGroupbox('碰撞箱')
 
 SM:AddToggle("InfiniteJumpToggle", {
     Text = "碰撞箱追踪[100%]",
@@ -8014,84 +7862,13 @@ end);
 
 
 
-local SM = Tabs.tfz:AddRightGroupbox('背刺')
 
-function hasNotification(text)
-    for i, v in pairs(localPlayer.PlayerGui.Notis:GetChildren()) do
-        if string.find(v.Text:lower(), text) then
-            return true
-        end
-    end
-end
-local function backstab(model)
-    if not model then
-        return
-    else
-        local stabbing = tick()
-        local oldCf = localPlayer.Character.HumanoidRootPart.CFrame
-        task.spawn(function()
-            task.wait(0.2)
-            Network:WaitForChild("RemoteEvent"):FireServer("UseActorAbility", {buffer.fromstring("\"Dagger\"")})
-        end)
-        repeat
-            localPlayer.Character.HumanoidRootPart.CFrame = model.HumanoidRootPart.CFrame - (model.HumanoidRootPart.CFrame.LookVector * 1)
-            task.wait()
-        until (tick() - stabbing >= 3.5) or hasNotification("stab")
-        task.wait(0.5)
-        localPlayer.Character.HumanoidRootPart.CFrame = oldCf
-    end
-end
-local function backstabClose(model)
-    if not model then
-        return
-    else
-        if (localPlayer.Character.HumanoidRootPart.Position - model.HumanoidRootPart.Position).magnitude <= Options.BackstabRange.Value then
-            backstab(model)
-        end
-    end
-end
 
-SM:AddToggle("AutoDagger", {
-    Text = "自动背刺",
-    Default = false,
-    Callback = function(cool)
-        task.spawn(function()
-            while Toggles.AutoDagger.Value and task.wait(0.1) do
-                if hasAbilityReady("Dagger") and isSurvivor then
-                    local suc, res = pcall(backstab, killerModel)
-                    if not suc then
-                        warn("error when backstabbing:", res)
-                    end
-                end
-            end
-        end)
-    end
-})
-SM:AddToggle("DaggerAura", {
-    Text = "背刺光环",
-    Default = false,
-    Callback = function(cool)
-        task.spawn(function()
-            while Toggles.DaggerAura.Value and task.wait(0.1) do
-                if not Toggles.AutoDagger.Value and hasAbilityReady("Dagger") and isSurvivor then
-                    local suc, res = pcall(backstabClose, killerModel)
-                    if not suc then
-                        warn("error when backstabbing near killer:", res)
-                    end
-                end
-            end
-        end)
-    end
-})
-SM:AddSlider("BackstabRange", {
-    Text = "背刺光环范围",
-    Default = 20,
-    Min = 7,
-    Max = 99,
-    Rounding = 0
-})
 
-local SM = Tabs.tfz:AddRightGroupbox('暴力')
+
+
+
+local SM = Tabs.FightingKilling:AddRightGroupbox('暴力')
 
 local function getASurvivor(dist)
     local char = localPlayer.Character
@@ -8159,19 +7936,6 @@ SM:AddSlider("SlashAuraRange", {
     Default = 7,
     Min = 4,
     Max = 11,
-    Rounding = 0,
-})
-
-SM:AddToggle("HitboxExpander", { 
-    Text = "长臂猿扩展器",
-    Default = false,
-})
-
-SM:AddSlider("HitboxExpanderRange", {
-    Text = "长臂猿距离",
-    Default = 37,
-    Min = 20,
-    Max = 200,
     Rounding = 0,
 })
 
@@ -8243,37 +8007,6 @@ SM:AddToggle('KillAll', {
     end
 })
 
-SM:AddButton({
-    Text = "传送杀手",
-    Func = function ()
-        if playingState == "Spectating" then
-            return Notify("LightStar｜提示", "必须在一轮 窥视时无法使用此功能", 7)
-        end
-
-        local killer = workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild("Killers") and workspace.Players.Killers:GetChildren()[1]
-        if killer then
-            pcall(function()
-                localPlayer.Character.HumanoidRootPart.CFrame = killer.PrimaryPart.CFrame
-            end)
-        end
-    end
-})
-
-SM:AddButton({
-    Text = "传送随机幸存者",
-    Func = function()
-        if playingState == "Spectating" then
-            return Notify("LightStar｜提示", "必须在一轮 窥视时无法使用此功能", 7)
-        end
-        pcall(function()
-            if not (workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild("Survivors")) then return end
-            local survs = workspace.Players.Survivors:GetChildren()
-            if #survs == 0 then return end
-
-            localPlayer.Character.HumanoidRootPart.CFrame = survs[math.random(1, #survs)].HumanoidRootPart.CFrame
-        end)
-    end
-})
 
 
 
@@ -8287,8 +8020,7 @@ SM:AddButton({
 
 
 
-
-local Generator = Tabs.zdx:AddLeftGroupbox("修机功能")
+local Generator = Tabs.Generator:AddLeftGroupbox("修机功能")
 
 Generator:AddDropdown('FixMode', {
     Values = {'危险模式', '安全模式', '自调模式'},
@@ -8353,147 +8085,7 @@ Generator:AddToggle("AutoGenerator",{
     SyncToggleState = true,
 })
 
-local TelephoneFixGenerators = Tabs.zdx:AddRightGroupbox('传送修机')
 
-TelephoneFixGenerators:AddButton({
-    Text = '传送随机到发电机',
-    Func = function()
-        local player = game.Players.LocalPlayer
-        local character = player.Character
-        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
-        
-        local generators = workspace.Map.Ingame.Map:GetChildren()
-        for _, generator in ipairs(generators) do
-            if generator.Name == "Generator" and 
-               generator:FindFirstChild("Progress") and 
-               generator.Progress.Value < 100 then
-                
-                local generatorPart = generator:FindFirstChild("Main") or  
-                                     generator:FindFirstChild("Model") or
-                                     generator:FindFirstChild("Base")
-                
-                if generatorPart then
-                    character.HumanoidRootPart.CFrame = generatorPart.CFrame + Vector3.new(0, 3, 0)
-                    return  
-                end
-            end
-        end
-        warn("没有找到可修理的发电机")
-    end
-})
-
-TelephoneFixGenerators:AddToggle("AutoFix", {
-    Text = "自动轮换修理发电机",
-    Default = false,
-    Callback = function(enabled)
-        local threadId = tostring(math.random(1, 99999))
-        _G.AutoFixThreadId = threadId
-        
-        local function shouldContinue()
-            return _G.AutoFixThreadId == threadId and enabled
-        end
-        
-        local function allGeneratorsFixed()
-            for _, v in ipairs(game.Workspace.Map.Ingame.Map:GetChildren()) do
-                if v.Name == "Generator" and v.Progress.Value < 100 then
-                    return false
-                end
-            end
-            return true
-        end
-        
-        local function runGenerator()
-            while shouldContinue() and not allGeneratorsFixed() do
-                local generators = {}
-                for i, v in ipairs(game.Workspace.Map.Ingame.Map:GetChildren()) do
-                    if v.Name == "Generator" and v.Progress.Value < 100 then
-                        table.insert(generators, v)
-                    end
-                end
-                
-                for _, generator in ipairs(generators) do
-                    if not shouldContinue() or allGeneratorsFixed() then
-                        return
-                    end
-                    
-                    if generator.Progress.Value >= 100 then
-                        continue
-                    end
-                    
-                    local availablePositions = {
-                        Left = true,
-                        Right = true,
-                        Center = true
-                    }
-                    
-                    for _, player in ipairs(game.Players:GetPlayers()) do
-                        if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
-                            local hrp = player.Character.HumanoidRootPart
-                            for posName, pos in pairs(generator.Positions:GetChildren()) do
-                                if (hrp.Position - pos.Position).Magnitude < 5 then
-                                    availablePositions[posName] = false
-                                end
-                            end
-                        end
-                    end
-                    
-                    local positionToUse
-                    for posName, isAvailable in pairs(availablePositions) do
-                        if isAvailable then
-                            positionToUse = posName
-                            break
-                        end
-                    end
-                    
-                    if positionToUse and shouldContinue() and not allGeneratorsFixed() then
-                        local char = game.Players.LocalPlayer.Character
-                        if not char or not char.PrimaryPart then
-                            task.wait(1)
-                            continue
-                        end
-                        
-                        char.PrimaryPart.CFrame = generator.Positions[positionToUse].CFrame
-                        task.wait(0.2)
-                        generator.Remotes.RF:InvokeServer("enter")
-                        
-                        while shouldContinue() and generator.Progress.Value < 100 do
-                            task.wait(1.7)
-                            generator.Remotes.RE:FireServer()
-                            task.wait(0.2)
-                        end
-                        
-                        if shouldContinue() then
-                            generator.Remotes.RF:InvokeServer("leave")
-                        end
-                    end
-                end
-                
-                if shouldContinue() and not allGeneratorsFixed() then
-                    task.wait(1)
-                end
-            end
-        end
-
-        if enabled then
-            if _G.AutoFixThread then
-                _G.AutoFixThreadId = tostring(math.random(1, 99999))
-                task.cancel(_G.AutoFixThread)
-            end
-            _G.AutoFixThread = task.spawn(runGenerator)
-        else
-            _G.AutoFixThreadId = tostring(math.random(1, 99999))
-            if _G.AutoFixThread then
-                task.cancel(_G.AutoFixThread)
-                _G.AutoFixThread = nil
-            end
-        end
-    end
-}):AddKeyPicker("AimKeyPicker", {
-    Text = "自动轮换修理发电机",
-    Default = "X",
-    Mode = "Toggle",
-    SyncToggleState = true,
-})
 
 
 
@@ -8502,10 +8094,12 @@ TelephoneFixGenerators:AddToggle("AutoFix", {
 
 
     
-local TelephonelGeneratorsl = Tabs.zdx:AddLeftGroupbox("传送到发动机")
-for i = 1, 5 do
-TelephonelGeneratorsl:AddButton({
-        Text = "传送发动机 " .. i,
+
+local TelephoneGenerator = Tabs.Generator:AddRightGroupbox('传送')
+
+for a = 1, 5 do
+TelephoneGenerator:AddButton({
+        Text = "传送发动机 " .. a,
         Func = function ()
             if playingState == "Spectating" then
                 return Notify("LightStar｜提示", "必须在一轮 窥视时无法使用此功能", 7)
@@ -8521,10 +8115,45 @@ TelephonelGeneratorsl:AddButton({
                     end
                 end
 
-                if gens[i] and gens[i]:FindFirstChild("Positions") and gens[i].Positions:FindFirstChild("Center") then
-                    localPlayer.Character.HumanoidRootPart.CFrame = gens[i].Positions.Center.CFrame + Vector3.new(0, 10, 0)
+                if gens[a] and gens[a]:FindFirstChild("Positions") and gens[a].Positions:FindFirstChild("Center") then
+                    localPlayer.Character.HumanoidRootPart.CFrame = gens[a].Positions.Center.CFrame + Vector3.new(0, 10, 0)
                 end
             end)
+        end
+})
+end
+
+
+local WalkGenerator = Tabs.Generator:AddLeftGroupbox("行走")
+
+
+for b = 1, 5 do
+
+WalkGenerator:AddButton({
+        Text = "行走发动机 " .. b,
+        Func = function ()
+            if playingState == "Spectating" then
+                return Notify("LightStar｜提示", "必须在一轮 窥视时无法使用此功能", 7)
+            end
+
+            local s, r = pcall(function ()
+                if not (gameMap and gameMap.Ingame and gameMap.Ingame.Map) then return end
+                local gens = {}
+
+                for _, v in pairs(gameMap.Ingame.Map:GetChildren()) do
+                    if v.Name == "Generator" then
+                        table.insert(gens, v)
+                    end
+                end
+
+                if gens[b] and gens[b]:FindFirstChild("Positions") and gens[b].Positions:FindFirstChild("Center") then
+                    pcall(pathfindTo, gens[b].Positions.Center.Position)
+                end
+            end)
+
+            if not s then
+                warn("Pathfind failed", r)
+            end
         end
 })
 end
@@ -8552,69 +8181,64 @@ end
 
 
 
-
-local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("菜单", "wrench")
+local MenuGroup = Tabs["UI Settings"]:AddRightGroupbox("菜单", "wrench")
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
-	Default = Library.KeybindFrame.Visible,
-	Text = "键盘菜单",
-	Callback = function(value)
-		Library.KeybindFrame.Visible = value
-	end,
+    Default = Library.KeybindFrame.Visible,
+    Text = "键盘菜单",
+    Callback = function(value)
+        Library.KeybindFrame.Visible = value
+    end,
 })
+
 MenuGroup:AddToggle("ShowCustomCursor", {
-	Text = "自定义光标",
-	Default = true,
-	Callback = function(Value)
-		Library.ShowCustomCursor = Value
-	end,
+    Text = "自定义光标",
+    Default = true,
+    Callback = function(Value)
+        Library.ShowCustomCursor = Value
+    end,
 })
+
 MenuGroup:AddDropdown("NotificationSide", {
-	Values = { "Left", "Right" },
-	Default = "Right",
-
-	Text = "通知位置",
-
-	Callback = function(Value)
-		Library:SetNotifySide(Value)
-	end,
+    Values = { "Left", "Right" },
+    Default = "Right",
+    Text = "通知位置",
+    Callback = function(Value)
+        Library:SetNotifySide(Value)
+    end,
 })
-MenuGroup:AddDropdown("DPI缩小", {
-	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
-	Default = "100%",
 
-	Text = "DPI菜单缩小",
-
-	Callback = function(Value)
-		Value = Value:gsub("%%", "")
-		local DPI = tonumber(Value)
-
-		Library:SetDPIScale(DPI)
-	end,
+MenuGroup:AddDropdown("DPIDropdown", {
+    Values = { "25%", "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+    Default = "100%",
+    Text = "DPI菜单大小",
+    Callback = function(Value)
+        Value = Value:gsub("%%", "")
+        local DPI = tonumber(Value)
+        Library:SetDPIScale(DPI)
+    end,
 })
-MenuGroup:AddDivider()
-MenuGroup:AddLabel("菜单打开")
-	:AddKeyPicker("MenuKeybind", { Default = "RightShift", NoUI = true, Text = "Menu keybind" })
+
+MenuGroup:AddDivider()  
+MenuGroup:AddLabel("菜单打开")  
+    :AddKeyPicker("MenuKeybind", { 
+        Default = "RightShift",  
+        NoUI = true,            
+        Text = "Menu keyboard"    
+})
 
 MenuGroup:AddButton("摧毁界面", function()
-	Library:Unload()
+    Library:Unload()  
 end)
 
-Library.ToggleKeybind = Options.MenuKeybind 
-ThemeManager:SetLibrary(Library)
-SaveManager:SetLibrary(Library)
-
-SaveManager:IgnoreThemeSettings()
-
-SaveManager:SetIgnoreIndexes({ "MenuKeybind" })
-
-ThemeManager:SetFolder("LightStar｜Forsaken")
-SaveManager:SetFolder("LightStar｜Forsaken/Config")
-SaveManager:SetSubFolder("Config")
-SaveManager:BuildConfigSection(Tabs["UI Settings"])
-
-
+ThemeManager:SetLibrary(Library)  
+SaveManager:SetLibrary(Library)   
+SaveManager:IgnoreThemeSettings() 
+SaveManager:SetIgnoreIndexes({ "MenuKeybind" })  
+ThemeManager:SetFolder("LightStar｜Forsaken")            
+SaveManager:SetFolder("LightStar｜Forsaken/Config")  
+SaveManager:SetSubFolder("Config")       
+SaveManager:BuildConfigSection(Tabs["UI Settings"])  
 ThemeManager:ApplyToTab(Tabs["UI Settings"])
-
 
 SaveManager:LoadAutoloadConfig()
