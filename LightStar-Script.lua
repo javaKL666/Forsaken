@@ -4,7 +4,7 @@
 
 -- 加载Discord公告
 pcall(function()
-loadstring(game:HttpGet('https://pastebin.com/raw/sqLapSu8'))()
+     loadstring(game:HttpGet('https://pastebin.com/raw/sqLapSu8'))()
 end)
  
 local repo = 'https://raw.githubusercontent.com/javaKL666/Obsidian/main/'
@@ -5813,7 +5813,7 @@ ZZ:AddToggle("NoliDeleter", {
             end)
             
             if success then
-                Library:Notify("🟢 Noli清理器已激活 | 白名单: "..(allowedNoli and allowedNoli:GetFullName() or "无"))
+                Library:Notify("🟢 Noli清理器已激活 白名单: "..(allowedNoli and allowedNoli:GetFullName() or "无"))
             else
                 warn("❌ 初始化失败: "..tostring(err))
                 noliDeleterActive = false
@@ -7578,6 +7578,7 @@ local AttackAnimations = {
     'rbxassetid://109230267448394' --// Swing, Noli, Skin: Umbra
 };
 
+
         local RNG = Random.new();
         game:GetService('RunService').Heartbeat:Connect(function()
             if not HumanoidRootPart then
@@ -8298,7 +8299,32 @@ end
 
 
 
-local MenuGroup = Tabs["UI Settings"]:AddRightGroupbox("菜单", "wrench")
+local MenuGroup = Tabs["UI Settings"]:AddRightGroupbox("调试", "wrench")
+
+MenuGroup:AddButton("Watermark", {
+    Text = "显示水印",
+    Func = function()
+local DPIMenu = Library
+Library.SetDPIScale(DPIMenu, 100)
+local Watermark = Library
+Library.SetWatermarkVisibility(Watermark, true)
+local _ = Players.LocalPlayer
+local _ = Workspace.CurrentCamera
+local Startick = tick()
+local Ping = 0
+local Fps = 60
+local Stats = game:GetService("Stats")
+RunService.RenderStepped:Connect(function()
+    Ping = Ping + 1
+    if tick() - Startick >= 1 then
+        Fps = Ping
+        Startick = tick()
+        Ping = 0
+    end
+    Library:SetWatermark(("LightStar User ♎ %s Fps | %s Ping"):format(math.floor(Fps), math.floor(Stats.Network.ServerStatsItem["Data Ping"]:GetValue())))
+end)
+    end
+})
 
 MenuGroup:AddToggle("KeybindMenuOpen", {
     Default = Library.KeybindFrame.Visible,
