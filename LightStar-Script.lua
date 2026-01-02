@@ -1,8 +1,11 @@
 -- by JackEyeKL
 
 
+
+-- 加载Discord公告
+pcall(function()
 loadstring(game:HttpGet('https://pastebin.com/raw/sqLapSu8'))()
- 
+end)
  
 local repo = 'https://raw.githubusercontent.com/javaKL666/Obsidian/main/'
 
@@ -5846,11 +5849,6 @@ end)
 
 ZZ:AddToggle('VoidRushCollision', {
     Text = "VoidRush反碰撞"
-})
-
-ZZ:AddToggle('WalkspeedAntiCollision', {
-    Text = "VoidRush覆盖反碰撞(函数)",
-    Tooltip = "他是一个函数 必须有它才能工作VoidRush反碰撞的工作 打开后无效果"
 })
 
 pcall(function()
