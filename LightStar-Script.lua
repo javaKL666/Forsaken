@@ -1,9 +1,7 @@
 -- by JackEyeKL
 
 
-pcall(function()      
-     loadstring(game:HttpGet('https://pastebin.com/raw/CZ2SVCEp'))()       
-end)      
+loadstring(game:HttpGet('https://pastebin.com/raw/sqLapSu8'))()
  
  
 local repo = 'https://raw.githubusercontent.com/javaKL666/Obsidian/main/'
@@ -166,6 +164,8 @@ LightStar:AddDivider()
 LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush反碰撞</font></b>功能了")
 
 LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush无视碰撞</font></b>功能了")
+
+LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">低画质</font></b>功能了")
 
 local KillerSurvival = Tabs.Main:AddLeftGroupbox("玩家函数","user")
 
