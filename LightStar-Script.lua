@@ -160,7 +160,7 @@ Contributor:AddLabel("<b><font color=\"rgb(128, 0, 128)\">[宇星辰丫]</font><
 
 local LightStar = Tabs.new:AddRightGroupbox('日志','users')
 
-LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>内容 * 2")
+LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>内容 * 4")
 
 LightStar:AddDivider()
 
@@ -169,6 +169,8 @@ LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush反碰�
 LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush无视碰撞</font></b>功能了")
 
 LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">低画质</font></b>功能了")
+
+LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">饼干Esp</font></b>功能了")
 
 local KillerSurvival = Tabs.Main:AddLeftGroupbox("玩家函数","user")
 
@@ -776,14 +778,23 @@ ZZ:AddButton({
 
 local Auto = Tabs.Main:AddRightGroupbox('自动')
 
-Auto:AddToggle("AutoShedlesktly", { 
+Auto:AddSlider("AutoShedlesktlyFriedChickenHealth",{
+    Text = "低于血量",
+    Min = 15,
+    Default = 65,
+    Max = 95,
+    Callback = function()
+       end
+})
+
+Auto:AddToggle("AutoShedlesktlyFriedChicken", { 
     Text = "自动谢德鸡腿",
-    Tooltip = "在血量低于65时使用吃鸡腿能力",
+    Tooltip = "血量低于上方的值就会自动吃鸡腿技能",
     Callback = function()
         while Toggles.AutoShedlesktly.Value and task.wait() do
             pcall(function()
                 if isKiller then return end
-                if localPlayer.Character.Humanoid.Health <= 65 then
+                if localPlayer.Character.Humanoid.Health <= Options.AutoShedlesktlyFriedChickenHealth.Value then
                     actor.FireServer(actor, "UseActorAbility", {buffer.fromstring("\"FriedChicken\"")})
                 end
             end)
@@ -791,13 +802,24 @@ Auto:AddToggle("AutoShedlesktly", {
     end
 })
 
-Auto:AddToggle("AutoCoinFlip", {
+Auto:AddDivider()
+
+Auto:AddSlider("AutoChanceCoinFlipmew",{
+    Text = "#秒抛1次硬币",
+    Min = 1.8,
+    Default = 1.8,
+    Max = 5,
+    Callback = function()
+       end
+})
+
+Auto:AddToggle("AutoChanceCoinFlip", {
     Text = "自动Chance抛硬币",
     Default = false,
     Callback = function (cool)
         _G.coin = cool
         task.spawn(function()
-            while _G.coin and task.wait(2.1) do
+            while _G.coin and task.wait(Options.AutoChanceCoinFlipmew.Value) do
                 Network:WaitForChild("RemoteEvent"):FireServer("UseActorAbility", {buffer.fromstring("\"CoinFlip\"")})
             end
         end)
@@ -3093,7 +3115,7 @@ Visual:AddToggle("SurvivorHealth", {
                 textLabel.BackgroundTransparency = 1
                 textLabel.TextScaled = false
                 textLabel.Text = "血量: "..char.Humanoid.Health.."/"..char.Humanoid.MaxHealth
-                textLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+                textLabel.TextColor3 = Options.SurvivorHealthColor.Value
                 textLabel.Font = Enum.Font.Arcade
                 textLabel.Parent = billboard
 
@@ -3152,6 +3174,9 @@ Visual:AddToggle("SurvivorHealth", {
             end
         end
     end
+}):AddColorPicker("SurvivorHealthColor", {
+    Default = Color3.fromRGB(0, 255, 0),
+    Title = "幸存者血量(文字)颜色",
 })
 
 Visual:AddToggle("KillerHealth", {
@@ -3175,7 +3200,7 @@ Visual:AddToggle("KillerHealth", {
                 textLabel.BackgroundTransparency = 1
                 textLabel.TextScaled = false
                 textLabel.Text = "血量: "..char.Humanoid.Health.."/"..char.Humanoid.MaxHealth
-                textLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                textLabel.TextColor3 = Options.KillerHealthColor.Value
                 textLabel.Font = Enum.Font.Arcade
                 textLabel.Parent = billboard
 
@@ -3234,6 +3259,9 @@ Visual:AddToggle("KillerHealth", {
             end
         end
     end
+}):AddColorPicker("KillerHealthColor", {
+    Default = Color3.fromRGB(255, 255, 0),
+    Title = "杀手血量(文字)颜色",
 })
 
 
@@ -4756,6 +4784,30 @@ end)
 end
 end
 })
+
+Visual:AddToggle("GingerbreadESP", {
+    Text = "饼干ESP",
+})
+
+task.spawn(function()
+    while task.wait(0.1) do
+        pcall(function()
+            if not Toggles.GingerbreadESP.Value then return end
+            for i, v in pairs(gameMap.Ingame.CurrencyLocations:GetChildren()) do
+                if v:IsA("Model") and v:FindFirstChildWhichIsA("Part").Position.Y > -200 then
+                    if not v:FindFirstChild("gingerbread_esp") then
+                        local hl = Instance.new("Highlight", v)
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Name = "gingerbread_esp"
+                    else
+                        v.gingerbread_esp.FillColor = Color3.fromRGB(255, 50, 204)
+                        v.gingerbread_esp.OutlineTransparency = 1
+                    end
+                end
+            end
+        end)
+    end
+end)
 
 
 
