@@ -157,15 +157,15 @@ Contributor:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[JackEyeKL]</font></b> -
 
 Contributor:AddLabel("<b><font color=\"rgb(128, 0, 128)\">[宇星辰丫]</font></b> - 提供原脚本部分源码")
 
-local LightStar = Tabs.new:AddRightGroupbox('用户','users')
+local LightStar = Tabs.new:AddRightGroupbox('日志','users')
 
-LightStar:AddLabel("欢迎用户来到<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>中心")
-
-LightStar:AddLabel("执行者用户使用了<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>")
+LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>内容 * 2")
 
 LightStar:AddDivider()
 
-LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>内容 * 0")
+LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush反碰撞</font></b>功能了")
+
+LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush无视碰撞</font></b>功能了")
 
 local KillerSurvival = Tabs.Main:AddLeftGroupbox("玩家函数","user")
 
@@ -406,6 +406,13 @@ KillerSurvival:AddToggle("Invis", {
             end
         end
     end
+})
+
+KillerSurvival:AddButton({
+    Text = "低画质",
+    Func = function()
+loadstring(game:HttpGet('https://raw.githubusercontent.com/vexroxd/My-Script-/main/roblox%20fps%20unlocker%20script.lua'))()
+   end
 })
 
 
@@ -696,7 +703,7 @@ Telephone:AddButton({
 
 
 
-local ZZ = Tabs.Main:AddRightGroupbox('自动拾取物品')
+local ZZ = Tabs.Main:AddRightGroupbox('物品')
 
 ZZ:AddToggle("AutoPickUpNearItems", {
     Text = "自动捡最近的物品",
@@ -5605,6 +5612,8 @@ local function removeTouchInterests(object)
     end
 end
 
+Disabled:AddLabel("<b><font color=\"rgb(255, 0, 0)\">[注意]</font></b> 开启下面 功能 会造成卡顿")
+
 -- Anti John Doe Trail
 Disabled:AddToggle("AJDT", {
     Text = "反约翰 多乱码路径", 
@@ -5778,16 +5787,19 @@ local function deleteNewNoli()
         for _, child in ipairs(killers:GetChildren()) do
             if child.Name == "Noli" and child ~= allowedNoli then
                 child:Destroy()
-                print("✅ 已删除新Noli: "..child:GetFullName())
+                Library:Notify("✅ 已删除新Noli: "..child:GetFullName())
             end
         end
     end)
 end
 
+ZZ:AddLabel("<b><font color=\"rgb(255, 0, 0)\">[注意]</font></b> VoidRush无视碰撞 每1局都要重开")
+
 
 ZZ:AddToggle("NoliDeleter", {
     Text = "反假Noli",
     Default = false,
+    Tooltip = "你的杀手角色是Noli 杀手快到你的时候 必须关闭这功能",
     Callback = function(enabled)
         noliDeleterActive = enabled
         
@@ -5798,7 +5810,7 @@ ZZ:AddToggle("NoliDeleter", {
             end)
             
             if success then
-                print("🟢 Noli清理器已激活 | 白名单: "..(allowedNoli and allowedNoli:GetFullName() or "无"))
+                Library:Notify("🟢 Noli清理器已激活 | 白名单: "..(allowedNoli and allowedNoli:GetFullName() or "无"))
             else
                 warn("❌ 初始化失败: "..tostring(err))
                 noliDeleterActive = false
@@ -5809,13 +5821,13 @@ ZZ:AddToggle("NoliDeleter", {
                 deletionConnection:Disconnect()
                 deletionConnection = nil
             end
-            print("🔴 Noli清理器已停用")
+            Library:Notify("🔴 Noli清理器已停用")
         end
     end
 })
 
 ZZ:AddToggle('VoidRushNoclip', {
-    Text = "Noli冲刺穿墙"
+    Text = "VoidRush穿墙"
 })
 
 task.spawn(function()
@@ -5832,6 +5844,101 @@ task.spawn(function()
     end
 end)
 
+ZZ:AddToggle('VoidRushCollision', {
+    Text = "VoidRush反碰撞"
+})
+
+ZZ:AddToggle('WalkspeedAntiCollision', {
+    Text = "VoidRush覆盖反碰撞(函数)",
+    Tooltip = "他是一个函数 必须有它才能工作VoidRush反碰撞的工作 打开后无效果"
+})
+
+pcall(function()
+    local old
+    old = hookmetamethod(game, "__namecall", function(self, ...)
+        local args = {...}
+        if type(args[1]) == "string" and string.find(args[1], localPlayer.Name) then
+            if string.find(args[1], "VoidRushCollision") then
+                if Toggles.VoidRushCollision.Value then
+                    return
+                end
+            elseif string.find(args[1], "C00lkiddCollision") then
+                if Toggles.WalkspeedAntiCollision.Value then
+                    return
+                end
+            end
+        end
+        return old(self, ...)
+    end)
+end)
+
+
+ZZ:AddToggle("VoidRushLgnoreCollision", {
+    Text = "VoidRush无视碰撞",
+    Default = false,
+    Callback = function()    
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild("Humanoid")
+local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
+
+
+local ORIGINAL_DASH_SPEED = 60
+
+local isOverrideActive = false
+local connection
+
+local function startOverride()
+    if isOverrideActive then return end
+    isOverrideActive = true
+
+    
+    connection = RunService.RenderStepped:Connect(function()
+      
+        Humanoid.WalkSpeed = ORIGINAL_DASH_SPEED
+        Humanoid.AutoRotate = false
+        
+        local direction = HumanoidRootPart.CFrame.LookVector
+        local horizontalDirection = Vector3.new(direction.X, 0, direction.Z).Unit
+     
+        Humanoid:Move(horizontalDirection)
+    end)
+end
+
+local function stopOverride()
+    if not isOverrideActive then return end
+    isOverrideActive = false
+
+    
+    Humanoid.WalkSpeed = 16 
+    Humanoid.AutoRotate = true
+    Humanoid:Move(Vector3.new(0, 0, 0)) 
+    
+    if connection then
+        connection:Disconnect()
+        connection = nil
+    end
+end
+
+
+RunService.RenderStepped:Connect(function()
+    local voidRushState = Character:GetAttribute("VoidRushState")
+
+    if voidRushState == "Dashing" then
+        startOverride()
+    else
+        stopOverride()
+    end
+end)
+     end
+})
+
+
+
+
 
 
 
@@ -5847,7 +5954,7 @@ local function manageVoidRushState(character)
 end
 
 ZZ:AddToggle("VoidRushOverride", {
-    Text = "Noli冲刺优化",
+    Text = "VoidRush冲刺优化",
     Default = false,
     Tooltip = "需要锁定视角",
     Callback = function(enabled)
@@ -6332,10 +6439,10 @@ ZZ:AddToggle("RemoveSlateskin", {
 
 
 
-local Disabled = Tabs.BanEffect:AddLeftGroupbox('访客反效果')
+local Disabled = Tabs.BanEffect:AddLeftGroupbox('访客1337反效果')
 -- 1. 反访客冲刺没有击中都缓慢
 Disabled:AddToggle("RemoveSlowed", {
-    Text = "反访客冲刺没有击中都缓慢", 
+    Text = "反冲刺没有击中都缓慢", 
     Default = false,
     Callback = function(v)
         -- 修复点：使用局部变量保存连接
@@ -6385,7 +6492,7 @@ Disabled:AddToggle("RemoveSlowed", {
 
 -- 2. 反访客格挡时移速问题 (独立变量名)
 Disabled:AddToggle("RemoveBlockingSlow", {
-    Text = "反访客格挡时移速问题", 
+    Text = "反格挡时移速问题", 
     Default = false,
     Callback = function(v)
         if not _G.BlockingCleanup then _G.BlockingCleanup = {} end
@@ -6430,7 +6537,7 @@ Disabled:AddToggle("RemoveBlockingSlow", {
 
 -- 3. 反访客拳击时移速问题 (独立变量名)
 Disabled:AddToggle("RemovePunchSlow", {
-    Text = "反访客拳击时移速问题", 
+    Text = "反拳击时移速问题", 
     Default = false,
     Callback = function(v)
         if not _G.PunchCleanup then _G.PunchCleanup = {} end
@@ -6477,7 +6584,7 @@ Disabled:AddToggle("RemovePunchSlow", {
 
 -- 5. 反访客冲刺结束效果
 Disabled:AddToggle("RemoveChargeEnded", {
-    Text = "反访客冲刺结束效果", 
+    Text = "反冲刺结束效果", 
     Default = false,
     Callback = function(v)
         if not _G.ChargeEndedCleanup then _G.ChargeEndedCleanup = {} end
@@ -7939,6 +8046,10 @@ local function assist(target, dist)
         localPlayer.Character.HumanoidRootPart.CFrame = CFrame.new(Vector3.new(pos.X, pos.Y, pos.Z), Vector3.new(targetPos.X, pos.Y, targetPos.Z))
     end
 end
+
+SM:AddDivider()
+
+SM:AddLabel("<b><font color=\"rgb(255, 0, 0)\">[注意]</font></b> 每25秒传送幸存者并攻击")
 
 SM:AddToggle('KillAll', {
     Text = "自动攻击所有玩家",
