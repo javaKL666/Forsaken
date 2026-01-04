@@ -64,7 +64,7 @@ local Window = Library:CreateWindow({
 
 local Tabs = {
     new = Window:AddTab('公告','external-link','公告&信息'),
-    Main = Window:AddTab('玩家','user','修改&篡改'),
+    Main = Window:AddTab('玩家','user','这是主要的!!!'),
     Aimbot = Window:AddTab('自瞄','mouse','让你自瞄的更准!!!'),
     Esp = Window:AddTab('ESP','scan-eye','让你能够透视他们!!!'),
     NotificationListen = Window:AddTab('通知提示','eye','让你帮助你监听杀手!!!'),
@@ -154,25 +154,19 @@ setclipboard("https://discord.gg/CvB4H8xgEM")
 
 local Contributor = Tabs.new:AddRightGroupbox('贡献者')
 
-Contributor:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[JackEyeKL]</font></b> - 脚本作者")
+Contributor:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[JackEyeKL]</font></b> - 脚本所有者")
 
 Contributor:AddLabel("<b><font color=\"rgb(128, 0, 128)\">[宇星辰丫]</font></b> - 提供原脚本部分源码")
 
 local LightStar = Tabs.new:AddRightGroupbox('日志','users')
 
-LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>内容 * 4")
+LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</font></b>内容 * 0")
 
 LightStar:AddDivider()
 
-LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush反碰撞</font></b>功能了")
+--LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">功能</font></b>功能了")
 
-LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">Noli VoidRush无视碰撞</font></b>功能了")
-
-LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">低画质</font></b>功能了")
-
-LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">饼干Esp</font></b>功能了")
-
-local KillerSurvival = Tabs.Main:AddLeftGroupbox("玩家函数","user")
+local KillerSurvival = Tabs.Main:AddLeftGroupbox("玩家","user")
 
 game.Players.LocalPlayer.Character.Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
     if _env.NoStun == true and game.Players.LocalPlayer.Character.Humanoid.WalkSpeed < 16 then
@@ -472,7 +466,7 @@ local function backstabClose(model)
 end
 
 SM:AddToggle("AutoDagger", {
-    Text = "自动背刺",
+    Text = "自动传送背刺",
     Default = false,
     Callback = function(cool)
         task.spawn(function()
@@ -656,13 +650,13 @@ Lighting:AddToggle("启用功能",{
 
 
 
-local Telephone = Tabs.Main:AddRightGroupbox('传送')
+local Teleport = Tabs.Main:AddRightGroupbox('传送')
 
 
 
 
 
-Telephone:AddButton({
+Teleport:AddButton({
     Text = "传送杀手",
     Func = function ()
         if playingState == "Spectating" then
@@ -678,7 +672,7 @@ Telephone:AddButton({
     end
 })
 
-Telephone:AddButton({
+Teleport:AddButton({
     Text = "传送随机幸存者",
     Func = function()
         if playingState == "Spectating" then
@@ -791,7 +785,7 @@ Auto:AddToggle("AutoShedlesktlyFriedChicken", {
     Text = "自动谢德鸡腿",
     Tooltip = "血量低于上方的值就会自动吃鸡腿技能",
     Callback = function()
-        while Toggles.AutoShedlesktly.Value and task.wait() do
+        while Toggles.AutoShedlesktlyFriedChicken.Value and task.wait() do
             pcall(function()
                 if isKiller then return end
                 if localPlayer.Character.Humanoid.Health <= Options.AutoShedlesktlyFriedChickenHealth.Value then
@@ -1405,44 +1399,44 @@ local function jasonaimbot(state)
 end
 
 -- 幸存者UI
-SB:AddToggle('MyToggle', {
+SB:AddToggle('ChanceAimbot', {
     Text = 'Chance 自瞄 ',
     Default = false,
     Callback = chanceAimbot
 })
 
-SB:AddToggle('MyToggle', {
+SB:AddToggle('TwoTimeAimbot', {
     Text = 'TwoTime 自瞄',
     Default = false,
     Callback = TWO
 })
 
-SB:AddToggle('MyToggle', {
+SB:AddToggle('ShedletskyAimbot', {
     Text = '谢德 自瞄',
     Default = false,
     Callback = shedletskyAimbot
 })
 
 -- 杀手UI
-SC:AddToggle('MyToggle', {
+SC:AddToggle('1x1x1x1Aimbot', {
     Text = '1x4自瞄',
     Default = false,
     Callback = aimbot1x1x1x1
 })
 
-SC:AddToggle('MyToggle', {
+SC:AddToggle('c00lkiddAimbot', {
     Text = '酷小孩自瞄',
     Default = false,
     Callback = cool
 })
 
-SC:AddToggle('MyToggle', {
+SC:AddToggle('JohnDoeAimbot', {
     Text = '约翰 多自瞄',
     Default = false,
     Callback = johnaimbot
 })
 
-SC:AddToggle('MyToggle', {
+SC:AddToggle('JasonAimbot', {
     Text = '杰森自瞄',
     Default = false,
     Callback = jasonaimbot
@@ -2443,7 +2437,7 @@ local function updateHighlights()
     end
 end
 
-Visual:AddToggle("NoliHighlightToggle", {
+Visual:AddToggle("FakeNoliESP", {
     Text = "假NoliESP",
     Default = false,
     Callback = function(enabled)
@@ -3393,8 +3387,8 @@ Visual:AddToggle("RealGeneratorESP", {
                         data.Highlight.Enabled = true
                         local transparency = math.clamp((distance - 50) / 100, 0, 0.4)
                         data.Highlight.FillTransparency = 0.85 + (transparency * 0.5)
-                        data.Highlight.OutlineColor = Color3.fromRGB(0, 255, 0) -- 绿色
-                        data.Highlight.FillColor = Color3.fromRGB(0, 255, 0)
+                        data.Highlight.OutlineColor = Options.RealGeneratorESPedgeColor.Value
+                        data.Highlight.FillColor = Options.RealGeneratorESPColor.Value
                     end
                 end
             end
@@ -3457,7 +3451,7 @@ Visual:AddToggle("RealGeneratorESP", {
             highlight.Name = "RealGeneratorHighlight"
             highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             highlight.Enabled = true
-            highlight.OutlineColor = Color3.fromRGB(0, 255, 0) -- 绿色
+            highlight.OutlineColor = Color3.fromRGB(0, 255, 0)
             highlight.FillColor = Color3.fromRGB(0, 255, 0)
             highlight.FillTransparency = 0.9
             highlight.OutlineTransparency = 0
@@ -3569,6 +3563,12 @@ Visual:AddToggle("RealGeneratorESP", {
         
         scanGenerators()
     end
+}):AddColorPicker("RealGeneratorESPColor", {
+    Default = Color3.fromRGB(0, 255, 0),
+    Title = "真发动机高亮颜色",
+}):AddColorPicker("RealGeneratorESPedgeColor", {
+    Default = Color3.fromRGB(0, 255, 0),
+    Title = "真发动机边缘颜色",
 })
 
 -- 假发动机ESP
@@ -3628,8 +3628,8 @@ Visual:AddToggle("FakeGeneratorESP", {
             highlight.Name = "FakeGeneratorHighlight"
             highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             highlight.Enabled = true
-            highlight.OutlineColor = Color3.fromRGB(255, 0, 0)
-            highlight.FillColor = Color3.fromRGB(255, 0, 0)
+            highlight.OutlineColor = Options.FakeGeneratorESPedgeColor.Value
+            highlight.FillColor = Options.FakeGeneratorESPColor.Value
             highlight.FillTransparency = 0.9
             highlight.OutlineTransparency = 0
             highlight.Parent = gen
@@ -3755,6 +3755,12 @@ Visual:AddToggle("FakeGeneratorESP", {
         
         scanGenerators()
     end
+}):AddColorPicker("FakeGeneratorESPColor", {
+    Default = Color3.fromRGB(255, 0, 0),
+    Title = "假发动机高亮颜色",
+}):AddColorPicker("FakeGeneratorESPedgeColor", {
+    Default = Color3.fromRGB(255, 0, 0),
+    Title = "假动机边缘颜色",
 })
 
 -- 特殊发动机ESP
@@ -3835,8 +3841,8 @@ Visual:AddToggle("NoliWarningESP", {
             highlight.Name = "NoliWarningHighlight"
             highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
             highlight.Enabled = true
-            highlight.OutlineColor = Color3.fromRGB(255, 0, 255)
-            highlight.FillColor = Color3.fromRGB(255, 0, 255)
+            highlight.OutlineColor = Options.NoliWarningGeneratorESPedgeColor.Value
+            highlight.FillColor = Options.NoliWarningGeneratorESPColor.Value
             highlight.FillTransparency = 0.7
             highlight.OutlineTransparency = 0
             highlight.Parent = gen
@@ -3953,6 +3959,12 @@ Visual:AddToggle("NoliWarningESP", {
         
         scanGenerators()
     end
+}):AddColorPicker("NoliWarningGeneratorESPColor", {
+    Default = Color3.fromRGB(255, 0, 255),
+    Title = "Noli传送发动机高亮颜色",
+}):AddColorPicker("NoliWarningGeneratorESPedgeColor", {
+    Default = Color3.fromRGB(255, 0, 255),
+    Title = "Noli传送发动机边缘颜色",
 })
 
 
@@ -4684,6 +4696,33 @@ Visual:AddSlider("FootOffset", {
 
 local Visual = Tabs.Esp:AddLeftGroupbox("物品ESP")
 
+Visual:AddToggle("GingerbreadESP", {
+    Text = "饼干ESP",
+}):AddColorPicker("GingerbreadESPColor", {
+    Default = Color3.fromRGB(255, 50, 204),
+    Title = "饼干ESP颜色",
+})
+
+task.spawn(function()
+    while task.wait(0.1) do
+        pcall(function()
+            if not Toggles.GingerbreadESP.Value then return end
+            for i, v in pairs(gameMap.Ingame.CurrencyLocations:GetChildren()) do
+                if v:IsA("Model") and v:FindFirstChildWhichIsA("Part").Position.Y > -200 then
+                    if not v:FindFirstChild("gingerbread_Esp") then
+                        local hl = Instance.new("Highlight", v)
+                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+                        hl.Name = "gingerbread_Esp"
+                    else
+                        v.gingerbread_Esp.FillColor = Options.GingerbreadESPColor.Value
+                        v.gingerbread_Esp.OutlineTransparency = 1
+                    end
+                end
+            end
+        end)
+    end
+end)
+
 local LibESP = loadstring(game:HttpGet("https://raw.githubusercontent.com/ImamGV/Script/main/ESP"))()
 
 Visual:AddToggle("EKE",{
@@ -4785,29 +4824,6 @@ end
 end
 })
 
-Visual:AddToggle("GingerbreadESP", {
-    Text = "饼干ESP",
-})
-
-task.spawn(function()
-    while task.wait(0.1) do
-        pcall(function()
-            if not Toggles.GingerbreadESP.Value then return end
-            for i, v in pairs(gameMap.Ingame.CurrencyLocations:GetChildren()) do
-                if v:IsA("Model") and v:FindFirstChildWhichIsA("Part").Position.Y > -200 then
-                    if not v:FindFirstChild("gingerbread_esp") then
-                        local hl = Instance.new("Highlight", v)
-                        hl.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
-                        hl.Name = "gingerbread_esp"
-                    else
-                        v.gingerbread_esp.FillColor = Color3.fromRGB(255, 50, 204)
-                        v.gingerbread_esp.OutlineTransparency = 1
-                    end
-                end
-            end
-        end)
-    end
-end)
 
 
 
@@ -6375,7 +6391,7 @@ ZZ:AddToggle("RemoveBlindness", {
     end
 })
 
-local ZZ = Tabs.BanEffect:AddRightGroupbox('谢德反效果')
+local ZZ = Tabs.BanEffect:AddRightGroupbox('通用反效果')
 
 ZZ:AddToggle("RemoveStunningKiller", {
     Text = "反谢德出剑缓慢移速", 
@@ -6435,10 +6451,7 @@ ZZ:AddToggle("RemoveStunningKiller", {
     end
 })
 
-
-local ZZ = Tabs.BanEffect:AddRightGroupbox('菜鸟反效果')
-
-ZZ:AddToggle("RemoveSlateskin", {
+ZZ:AddToggle("NoobRemoveSlateskin", {
     Text = "反菜鸟石板皮肤缓慢效果", 
     Default = false,
     Callback = function(v)
@@ -6486,10 +6499,33 @@ ZZ:AddToggle("RemoveSlateskin", {
     end
 })
 
+ZZ:AddToggle("AntiSubspace", {
+    Text = "反塔夫模糊和颜色反转效果",
+    Default = false,
+    Tooltip = "早期9178年前 人们通常都无法受到这种效果",
+    Callback = function()
+        task.spawn(function()
+            while Toggles.AntiSubspace.Value and task.wait() do
+                local subspace = {
+                    "SubspaceVFXBlur",
+                    "SubspaceVFXColorCorrection"
+                }
+
+                for i, v in pairs(subspace) do
+                    if game.Lighting:FindFirstChild(v) then
+                        game.Lighting[v]:Destroy()
+                    end
+                end
+            end
+        end)
+    end
+})
+
 
 
 
 local Disabled = Tabs.BanEffect:AddLeftGroupbox('访客1337反效果')
+
 -- 1. 反访客冲刺没有击中都缓慢
 Disabled:AddToggle("RemoveSlowed", {
     Text = "反冲刺没有击中都缓慢", 
@@ -6725,7 +6761,7 @@ end)
 local bai = {Spr = false}
 local connection
 
-MVP:AddToggle('MyToggle', {
+MVP:AddToggle('InfiniteStamina', {
     Text = '无限体力',
     Default = false,
     Callback = function(state)
@@ -7486,6 +7522,8 @@ SM:AddToggle("打人", {
 
 local SM = Tabs.FightingKilling:AddLeftGroupbox('自调碰撞箱追踪')
 
+SM:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 每1局要开1次")
+
 SM:AddSlider("DistanceSlider", {
     Text = "距离范围",
     Tooltip = "调整自动攻击的最大距离",
@@ -8100,8 +8138,6 @@ end
 
 SM:AddDivider()
 
-SM:AddLabel("<b><font color=\"rgb(255, 0, 0)\">[注意]</font></b> 每25秒传送幸存者并攻击")
-
 SM:AddToggle('KillAll', {
     Text = "自动攻击所有玩家",
     Callback = function(s)
@@ -8130,7 +8166,7 @@ SM:AddToggle('KillAll', {
             local plr = game.Players:FindFirstChild(name)
             if plr then
                 local skipTimeout = tick()
-                while tick() - skipTimeout <= 25 do
+                while tick() - skipTimeout <= Options.KillAllmew.Value do
                     if localPlayer:GetNetworkPing() >= 0.3 then
                         Toggles.KillAll:SetValue(false)
                         return game.StarterGui:SetCore("SendNotification", { Title = "LightStar-提示", Text = "杀死所有停止 因为你的ping太高了 尝试获得更好的WiFi并再试一次", Duration = 9 })
@@ -8159,6 +8195,14 @@ SM:AddToggle('KillAll', {
             end
         end
     end
+})
+
+SM:AddSlider("KillAllmew", {
+    Text = "#秒传送另1个幸存者",
+    Default = 25,
+    Min = 5,
+    Max = 60,
+    Rounding = 0,
 })
 
 
@@ -8297,10 +8341,10 @@ Generator:AddToggle("AutoStartGenerator", {
 
     
 
-local TelephoneGenerator = Tabs.Generator:AddRightGroupbox('传送')
+local TeleportGenerator = Tabs.Generator:AddRightGroupbox('传送')
 
 for a = 1, 5 do
-TelephoneGenerator:AddButton({
+TeleportGenerator:AddButton({
         Text = "传送发动机 " .. a,
         Func = function ()
             if playingState == "Spectating" then
