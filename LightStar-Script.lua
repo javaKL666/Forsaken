@@ -14,7 +14,7 @@ local repo = 'https://raw.githubusercontent.com/javaKL666/Obsidian/main/'
 
 
 
-local Library = loadstring(game:HttpGet(repo .. "Library.lua"))()
+local Library = loadstring(game:HttpGet(repo .. "SquareLibrary.lua"))()
 local ThemeManager = loadstring(game:HttpGet(repo .. "addons/ThemeManager.lua"))()
 local SaveManager = loadstring(game:HttpGet(repo .. "addons/SaveManager.lua"))()
 
@@ -45,16 +45,15 @@ local Network = replicatedStorage:WaitForChild("Modules"):WaitForChild("Network"
 local gameMap = workspace.Map
 local actor = Network:WaitForChild("RemoteEvent")
 
+Library.ForceCheckbox = false -- 默认点击开关盒子 (false / true)
 Library.ShowToggleFrameInKeybinds = true 
-Library.ShowCustomCursor = true
-Library.NotifySide = "Right"
 
 local Window = Library:CreateWindow({
 	Title = "LightStar",
-	Footer = "by JackEyeKL-Hello user " ..game.Players.LocalPlayer.Name.. "-" ..identifyexecutor() .."-discord.gg/BW55cR7Z [Source can be viewed]",
+	Footer = "by JackEyeKL-Hello user " ..game.Players.LocalPlayer.DisplayName.. "-" ..identifyexecutor() .."-discord.gg/BW55cR7Z [Source can be viewed]",
 	Icon = 97914301936069,
-	NotifySide = "Right",
-	ShowCustomCursor = false,
+	NotifySide = "Top-Right",
+	ShowCrosshair = false,
 	Center = true,
     AutoShow = true,
     Resizable = true,
@@ -133,10 +132,10 @@ information:AddLabel("执行器 : " ..identifyexecutor())
 information:AddLabel("用户名 : " ..game.Players.LocalPlayer.Name)
 information:AddLabel("用户Id : "..game.Players.LocalPlayer.UserId)
 information:AddLabel("昵称 : "..game.Players.LocalPlayer.DisplayName)
-information:AddLabel("账户年龄 : "..game.Players.LocalPlayer.AccountAge.." 天")
+information:AddLabel("用户年龄 : "..game.Players.LocalPlayer.AccountAge.." 天")
 
 
-local Discord = Tabs.new:AddLeftGroupbox('Discord','external-link')
+local Discord = Tabs.new:AddLeftGroupbox('团队','external-link')
 
 Discord:AddButton({
     Text = "复制 LightStar Discord 链接",
@@ -154,9 +153,9 @@ setclipboard("https://discord.gg/CvB4H8xgEM")
 
 local Contributor = Tabs.new:AddRightGroupbox('贡献者')
 
-Contributor:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[JackEyeKL]</font></b> - 脚本所有者")
+Contributor:AddLabel("[<b><font color=\"rgb(0, 0, 255)\">JackEyeKL</font></b>] - 脚本所有者")
 
-Contributor:AddLabel("<b><font color=\"rgb(128, 0, 128)\">[宇星辰丫]</font></b> - 提供原脚本部分源码")
+Contributor:AddLabel("[<b><font color=\"rgb(128, 0, 128)\">宇星辰丫</font></b>] - 提供原脚本部分源码")
 
 local LightStar = Tabs.new:AddRightGroupbox('日志','users')
 
@@ -506,6 +505,8 @@ SM:AddSlider("BackstabRange", {
     Max = 99,
     Rounding = 0
 })
+
+
 
 
 
@@ -5864,9 +5865,6 @@ local function deleteNewNoli()
     end)
 end
 
-ZZ:AddLabel("<b><font color=\"rgb(255, 0, 0)\">[注意]</font></b> VoidRush无视碰撞 每1局都要重开")
-
-
 ZZ:AddToggle("NoliDeleter", {
     Text = "反假Noli",
     Default = false,
@@ -5939,68 +5937,7 @@ pcall(function()
 end)
 
 
-ZZ:AddToggle("VoidRushLgnoreCollision", {
-    Text = "VoidRush无视碰撞",
-    Default = false,
-    Callback = function()    
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
 
-local LocalPlayer = Players.LocalPlayer
-local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
-local Humanoid = Character:WaitForChild("Humanoid")
-local HumanoidRootPart = Character:WaitForChild("HumanoidRootPart")
-
-
-local ORIGINAL_DASH_SPEED = 60
-
-local isOverrideActive = false
-local connection
-
-local function startOverride()
-    if isOverrideActive then return end
-    isOverrideActive = true
-
-    
-    connection = RunService.RenderStepped:Connect(function()
-      
-        Humanoid.WalkSpeed = ORIGINAL_DASH_SPEED
-        Humanoid.AutoRotate = false
-        
-        local direction = HumanoidRootPart.CFrame.LookVector
-        local horizontalDirection = Vector3.new(direction.X, 0, direction.Z).Unit
-     
-        Humanoid:Move(horizontalDirection)
-    end)
-end
-
-local function stopOverride()
-    if not isOverrideActive then return end
-    isOverrideActive = false
-
-    
-    Humanoid.WalkSpeed = 16 
-    Humanoid.AutoRotate = true
-    Humanoid:Move(Vector3.new(0, 0, 0)) 
-    
-    if connection then
-        connection:Disconnect()
-        connection = nil
-    end
-end
-
-
-RunService.RenderStepped:Connect(function()
-    local voidRushState = Character:GetAttribute("VoidRushState")
-
-    if voidRushState == "Dashing" then
-        startOverride()
-    else
-        stopOverride()
-    end
-end)
-     end
-})
 
 
 
@@ -6020,7 +5957,7 @@ local function manageVoidRushState(character)
 end
 
 ZZ:AddToggle("VoidRushOverride", {
-    Text = "VoidRush冲刺优化",
+    Text = "VoidRush无视碰撞",
     Default = false,
     Tooltip = "需要锁定视角",
     Callback = function(enabled)
@@ -6829,7 +6766,7 @@ MVP:AddToggle('SprintSpeedToggle', {
 
 
 
-local MVP = Tabs.PhysicalStrength:AddRightGroupbox("调试区")
+local MVP = Tabs.PhysicalStrength:AddRightGroupbox("调试")
 
 
 
@@ -8422,40 +8359,35 @@ end)
     end
 })
 
-MenuGroup:AddToggle("KeybindMenuOpen", {
-    Default = Library.KeybindFrame.Visible,
-    Text = "键盘菜单",
-    Callback = function(value)
-        Library.KeybindFrame.Visible = value
-    end,
+MenuGroup:AddToggle("ShowMobileLockButton", {
+	Text = "显示锁定按钮 (手机)",
+	Default = true,
+	Callback = function(Value)
+		Library.ShowMobileLockButton = Value
+	end,
 })
-
-MenuGroup:AddToggle("ShowCustomCursor", {
-    Text = "自定义光标",
-    Default = true,
-    Callback = function(Value)
-        Library.ShowCustomCursor = Value
-    end,
-})
-
 MenuGroup:AddDropdown("NotificationSide", {
-    Values = { "Left", "Right" },
-    Default = "Right",
-    Text = "通知位置",
-    Callback = function(Value)
-        Library:SetNotifySide(Value)
-    end,
-})
+	Values = { "Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left" },
+	Default = "Top-Right",
 
+	Text = "通知位置",
+
+	Callback = function(Value)
+		Library:SetNotifySide(Value)
+	end,
+})
 MenuGroup:AddDropdown("DPIDropdown", {
-    Values = { "25%", "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
-    Default = "100%",
-    Text = "DPI菜单大小",
-    Callback = function(Value)
-        Value = Value:gsub("%%", "")
-        local DPI = tonumber(Value)
-        Library:SetDPIScale(DPI)
-    end,
+	Values = { "50%", "75%", "100%", "125%", "150%", "175%", "200%" },
+	Default = "100%",
+
+	Text = "DPI菜单缩小",
+
+	Callback = function(Value)
+		Value = Value:gsub("%%", "")
+		local DPI = tonumber(Value)
+
+		Library:SetDPIScale(DPI)
+	end,
 })
 
 MenuGroup:AddDivider()  
