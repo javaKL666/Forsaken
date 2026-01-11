@@ -126,6 +126,14 @@ function killerAttack()
     end
 end
 
+
+local new = Tabs.new:AddLeftGroupbox('新闻🚀')
+
+new:AddLabel("[+]开发 JackEyeKL")
+new:AddLabel("支持是我们的最大的贡献💩")
+new:AddLabel("脚本更新于1.11 9:53 时间")
+
+--[[
 local information = Tabs.new:AddLeftGroupbox('玩家 信息','info')
 
 information:AddLabel("执行器 : " ..identifyexecutor())
@@ -133,29 +141,74 @@ information:AddLabel("用户名 : " ..game.Players.LocalPlayer.Name)
 information:AddLabel("用户Id : "..game.Players.LocalPlayer.UserId)
 information:AddLabel("昵称 : "..game.Players.LocalPlayer.DisplayName)
 information:AddLabel("用户年龄 : "..game.Players.LocalPlayer.AccountAge.." 天")
+--]]
 
+--[[
+local new = Tabs.new:AddLeftGroupbox('新')
 
-local Discord = Tabs.new:AddLeftGroupbox('团队','external-link')
+new:AddLabel("")
 
-Discord:AddButton({
+--]]
+
+--[[
+local Team = Tabs.new:AddLeftGroupbox('聊','external-link')
+
+Team:AddButton({
     Text = "复制 LightStar Discord 链接",
     Func = function ()
 setclipboard("https://discord.gg/BW55cR7Z")
        end
 })
 
-Discord:AddButton({
-    Text = "复制 Nolsaken Discord 链接",
+Team:AddDivider()
+
+Team:AddButton({
+    Text = "复制 LightStar 企鹅群 ①",
     Func = function ()
-setclipboard("https://discord.gg/CvB4H8xgEM")
+setclipboard("798979110")
        end
 })
 
+--]]
+
+local Team = Tabs.new:AddRightGroupbox('组织🍏')
+
+Team:AddButton({
+    Text = "复制 LightStar 企鹅群 ①",
+    Func = function ()
+setclipboard("798979110")
+       end
+})
+
+Team:AddButton({
+    Text = "复制 LightStar Discord 链接",
+    Func = function ()
+setclipboard("https://discord.gg/BW55cR7Z")
+       end
+})
+
+--]]
+
+-- Nolsaken团队遗憾走了之后才能开放的公告🤫🤫🤫 不准给我公开 公开的人斯浮木和全家😂😂
+
+--[[
+
+local RegretNolsakenTeam = Tabs.new:AddRightGroupbox('遗憾Nolsaken团队')
+
+RegretNolsakenTeamTeam:AddLabel("你好Nolsaken团队")
+RegretNolsakenTeamTeam:AddLabel("你们在1月4日4点56分发布最后1个视频")
+RegretNolsakenTeamTeam:AddLabel("请加入我们的LightStar团队")
+RegretNolsakenTeamTeam:AddLabel("走吧[<b><font color=\"rgb(128, 0, 128)\">Nolsaken团队</font></b>]")
+RegretNolsakenTeamTeam:AddLabel("我们有缘见Nolsaken团队")
+
+--]]
+
+--[[
 local Contributor = Tabs.new:AddRightGroupbox('贡献者')
 
 Contributor:AddLabel("[<b><font color=\"rgb(0, 0, 255)\">JackEyeKL</font></b>] - 脚本所有者")
 
-Contributor:AddLabel("[<b><font color=\"rgb(128, 0, 128)\">宇星辰丫</font></b>] - 提供原脚本部分源码")
+Contributor:AddLabel("[<b><font color=\"rgb(128, 0, 128)\">宇星辰丫</font></b>] - 提供Nol原脚本终极源码")
 
 local LightStar = Tabs.new:AddRightGroupbox('日志','users')
 
@@ -164,6 +217,7 @@ LightStar:AddLabel("新更新<b><font color=\"rgb(0, 255, 0)\">LightStar脚本</
 LightStar:AddDivider()
 
 --LightStar:AddLabel("添加<b><font color=\"rgb(0, 255, 0)\">功能</font></b>功能了")
+--]]
 
 local KillerSurvival = Tabs.Main:AddLeftGroupbox("玩家","user")
 
@@ -6328,7 +6382,7 @@ ZZ:AddToggle("RemoveBlindness", {
     end
 })
 
-local ZZ = Tabs.BanEffect:AddRightGroupbox('通用反效果')
+local ZZ = Tabs.BanEffect:AddRightGroupbox('奇葩反效果')
 
 ZZ:AddToggle("RemoveStunningKiller", {
     Text = "反谢德出剑缓慢移速", 
@@ -6358,7 +6412,7 @@ ZZ:AddToggle("RemoveStunningKiller", {
                 task.spawn(function()
                     for j = i, math.min(i + 4, #survivorList) do
                         local survivor = survivorList[j]
-                        local stunningKiller = survivor:FindFirstChild("StunningKiller")
+                        local stunningKiller = survivor:FindFirstChild("Killer")
                         if stunningKiller then
                             stunningKiller:Destroy()
                         end
@@ -6380,7 +6434,7 @@ ZZ:AddToggle("RemoveStunningKiller", {
         local survivorsFolder = workspace:FindFirstChild("Players") and workspace.Players:FindFirstChild("Survivors")
         if survivorsFolder then
             connections.descendantAdded = survivorsFolder.DescendantAdded:Connect(function(descendant)
-                if descendant.Name == "StunningKiller" then
+                if descendant.Name == "Killer" then
                     descendant:Destroy()
                 end
             end)
@@ -7667,6 +7721,7 @@ local AttackAnimations = {
 
 
 
+
 local SM = Tabs.FightingKilling:AddRightGroupbox('碰撞')
 
 SM:AddToggle("InfiniteJumpToggle", {
@@ -8332,7 +8387,7 @@ end
 
 
 
-local MenuGroup = Tabs["UI Settings"]:AddRightGroupbox("调试", "wrench")
+local MenuGroup = Tabs["UI Settings"]:AddLeftGroupbox("调试", "wrench")
 
 MenuGroup:AddButton("Watermark", {
     Text = "显示水印",
@@ -8367,7 +8422,7 @@ MenuGroup:AddToggle("ShowMobileLockButton", {
 	end,
 })
 MenuGroup:AddDropdown("NotificationSide", {
-	Values = { "Top-Left", "Top-Right", "Bottom-Right", "Bottom-Left" },
+	Values = {  "Top-Right", "Top-Left", "Bottom-Right", "Bottom-Left" },
 	Default = "Top-Right",
 
 	Text = "通知位置",
