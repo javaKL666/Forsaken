@@ -635,9 +635,9 @@ Camera:AddToggle("SpectateKiller", {
 })
 
 Camera:AddToggle('HiddenPlayerColumn', {
-    Text = '隐藏玩家栏',
+    Text = '隐藏对局玩家列表',
     Default = false,
-    Tooltip = '隐藏玩家列表及头像图标',
+    Tooltip = '隐藏玩家列表及头像图标 拍脚本最必用的',
     Callback = function(state)
         local player = game:GetService("Players").LocalPlayer
         local playergui = player:WaitForChild("PlayerGui")
@@ -670,10 +670,10 @@ Camera:AddToggle('HiddenPlayerColumn', {
 
 Camera:AddDivider()
 
-Camera:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 到对局内才能启用")
+Camera:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 到对局内才能生效")
 
-Camera:AddSlider("视野范围",{
-    Text = "调节范围",
+Camera:AddSlider("FovValue",{
+    Text = "视野调节",
     Min = 70,
     Default = 70,
     Max = 120,
@@ -686,8 +686,8 @@ Camera:AddSlider("视野范围",{
 
 _G.FovValue = 70
 
-Camera:AddToggle("应用范围",{
-    Text = "应用",
+Camera:AddToggle("StartFov",{
+    Text = "应用视野",
     Callback = function(v)
         _env.FOV = v
         game:GetService("RunService").RenderStepped:Connect(function()
@@ -934,8 +934,8 @@ Auto:AddDivider()
 Auto:AddSlider("AutoChanceCoinFlipmew",{
     Text = "#秒抛1次硬币",
     Min = 1.8,
-    Default = 1.8,
-    Max = 5,
+    Default = 2,
+    Max = 15,
     Callback = function()
        end
 })
