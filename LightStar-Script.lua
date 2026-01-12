@@ -131,7 +131,7 @@ local new = Tabs.new:AddLeftGroupbox('新闻🚀')
 
 new:AddLabel("[+]开发 JackEyeKL")
 new:AddLabel("支持是我们的最大的贡献💩")
-new:AddLabel("脚本更新于1.11 9:53 时间")
+new:AddLabel("脚本更新于1.12 晚上 7:16 时间")
 
 --[[
 local information = Tabs.new:AddLeftGroupbox('玩家 信息','info')
@@ -141,13 +141,6 @@ information:AddLabel("用户名 : " ..game.Players.LocalPlayer.Name)
 information:AddLabel("用户Id : "..game.Players.LocalPlayer.UserId)
 information:AddLabel("昵称 : "..game.Players.LocalPlayer.DisplayName)
 information:AddLabel("用户年龄 : "..game.Players.LocalPlayer.AccountAge.." 天")
---]]
-
---[[
-local new = Tabs.new:AddLeftGroupbox('新')
-
-new:AddLabel("")
-
 --]]
 
 --[[
@@ -189,7 +182,7 @@ setclipboard("https://discord.gg/BW55cR7Z")
 
 --]]
 
--- Nolsaken团队遗憾走了之后才能开放的公告🤫🤫🤫 不准给我公开 公开的人斯浮木和全家😂😂
+-- Nolsaken团队遗憾走了之后才能开放的公告🤫🤫🤫 当时Nolsaken群聊散的时候 我以为真跑路了 不准给我公开 公开的人斯浮木和全家😂😂
 
 --[[
 
@@ -312,26 +305,47 @@ KillerSurvival:AddToggle("SB",{
     end
 })
 
-KillerSurvival:AddToggle("AllowJump", {
-    Text = "启用跳跃",
+KillerSurvival:AddToggle('AllowJump', {
+    Text = '启用跳跃',
     Default = false,
-    Callback = function (state)
-        _G.AllowJump = state
+    Callback = function(value)
+        restoringJump = value
+        
+      Notify("LightStar-警告", "反复跳跃会踢你 因为游戏会认为你正在飞行！", 9)
 
-        if state then
-            Notify("LightStar-警告", "反复跳跃会踢你 因为游戏会认为你正在飞行！", 9)
-        end
+        if value then
+            task.spawn(function()
+                while restoringJump do
+                    local player = game:GetService("Players").LocalPlayer
+                    local char = player.Character or player.CharacterAdded:Wait()
+                    local humanoid = char:FindFirstChildOfClass("Humanoid")
+                    local jumpBtn = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("TouchGui") and player.PlayerGui.TouchGui:FindFirstChild("TouchControlFrame") and player.PlayerGui.TouchGui.TouchControlFrame:FindFirstChild("JumpButton")
 
-        task.spawn(function ()
-            while task.wait() do
-                if not _G.AllowJump then break end
-                local humanoid = localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid")
+                    if humanoid then
+                        humanoid.JumpPower = 50
+                    end
 
-                if humanoid then
-                    humanoid.JumpPower = 50
+                    if jumpBtn then
+                        jumpBtn.Visible = true
+                    end
+
+                    task.wait(1) 
                 end
+            end)
+        else
+            local player = game:GetService("Players").LocalPlayer
+            local char = player.Character
+            local humanoid = char and char:FindFirstChildOfClass("Humanoid")
+            local jumpBtn = player:FindFirstChild("PlayerGui") and player.PlayerGui:FindFirstChild("TouchGui") and player.PlayerGui.TouchGui:FindFirstChild("TouchControlFrame") and player.PlayerGui.TouchGui.TouchControlFrame:FindFirstChild("JumpButton")
+
+            if humanoid then
+                humanoid.JumpPower = 0
             end
-        end)
+
+            if jumpBtn then
+                jumpBtn.Visible = false
+            end
+        end
     end
 })
 
@@ -617,6 +631,70 @@ Camera:AddToggle("SpectateKiller", {
                 workspace.CurrentCamera.CameraSubject = localPlayer.Character
             end)
         end
+    end
+})
+
+Camera:AddToggle('HiddenPlayerColumn', {
+    Text = '隐藏玩家栏',
+    Default = false,
+    Tooltip = '隐藏玩家列表及头像图标',
+    Callback = function(state)
+        local player = game:GetService("Players").LocalPlayer
+        local playergui = player:WaitForChild("PlayerGui")
+        local playerinfo = playergui:WaitForChild("TemporaryUI"):WaitForChild("PlayerInfo")
+        if state then
+            if not hideBarConnection then
+                hideBarConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
+                    if survivors and survivors.Visible then
+                        survivors.Visible = false
+                    end
+                    local icon = playerinfo:FindFirstChild("PlayerIcon")
+                    if icon and icon.Image ~= ("rbxassetid://95816097006870") then
+                        icon.Image = "rbxassetid://95816097006870"
+                    end
+                end)
+            end
+        else
+            if hideBarConnection then
+                hideBarConnection:Disconnect()
+                hideBarConnection = nil
+            end
+            local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
+            if survivors then
+                survivors.Visible = true
+            end
+        end
+    end
+})
+
+Camera:AddDivider()
+
+Camera:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 到对局内才能启用")
+
+Camera:AddSlider("视野范围",{
+    Text = "调节范围",
+    Min = 70,
+    Default = 70,
+    Max = 120,
+    Rounding = 1,
+    Compact = true,
+    Callback = function(v)
+        _env.FovValue = v
+    end
+})
+
+_G.FovValue = 70
+
+Camera:AddToggle("应用范围",{
+    Text = "应用",
+    Callback = function(v)
+        _env.FOV = v
+        game:GetService("RunService").RenderStepped:Connect(function()
+            if _env.FOV then
+                workspace.Camera.FieldOfView = _env.FovValue
+            end
+        end)
     end
 })
 
@@ -6382,7 +6460,7 @@ ZZ:AddToggle("RemoveBlindness", {
     end
 })
 
-local ZZ = Tabs.BanEffect:AddRightGroupbox('奇葩反效果')
+local ZZ = Tabs.BanEffect:AddRightGroupbox('其他反效果')
 
 ZZ:AddToggle("RemoveStunningKiller", {
     Text = "反谢德出剑缓慢移速", 
@@ -6493,7 +6571,6 @@ ZZ:AddToggle("NoobRemoveSlateskin", {
 ZZ:AddToggle("AntiSubspace", {
     Text = "反塔夫模糊和颜色反转效果",
     Default = false,
-    Tooltip = "早期9178年前 人们通常都无法受到这种效果",
     Callback = function()
         task.spawn(function()
             while Toggles.AntiSubspace.Value and task.wait() do
@@ -6889,7 +6966,7 @@ MVP:AddSlider('MySlider4', {
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 
-local PZ = Tabs.Pizza:AddLeftGroupbox("披萨功能")
+local PZ = Tabs.Pizza:AddLeftGroupbox("披萨")
 
 local pizzaConnection = nil
 local pizzaTPConnection = nil
