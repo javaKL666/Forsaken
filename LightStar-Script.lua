@@ -131,7 +131,7 @@ local new = Tabs.new:AddLeftGroupbox('新闻🚀')
 
 new:AddLabel("[+]开发 JackEyeKL")
 new:AddLabel("支持是我们的最大的贡献💩")
-new:AddLabel("脚本更新于1.12 晚上 7:16 时间")
+new:AddLabel("脚本更新于1.13 晚上 9:53 时间")
 
 --[[
 local information = Tabs.new:AddLeftGroupbox('玩家 信息','info')
@@ -580,6 +580,186 @@ SM:AddSlider("BackstabRange", {
 
 
 
+local Game = Tabs.Main:AddLeftGroupbox('对局游戏')
+
+local hideBarConnection = nil
+local customIconId = "12549056837" 
+
+Game:AddInput('CustomIconInput', {
+    Default = '12549056837',
+    Numeric = false,
+    Finished = true,
+    ClearTextOnFocus = true,
+    Text = '替换玩家虚拟形象图标id',
+    Tooltip = '用于替换隐藏时显示的图标',
+    Placeholder = '请输入图片id',
+    Callback = function(value)
+        if tonumber(value) then
+            customIconId = value
+            Library:Notify("LightStar-提示\n图片更改成功", nil, 4590657391)
+        else
+            Library:Notify("LightStar-提示\n图片更改无效", nil, 4590657391)
+        end
+    end
+})
+
+Game:AddToggle('HiddenGamePlayerColumn', {
+    Text = '隐藏游戏对局玩家列表',
+    Default = false,
+    Tooltip = '隐藏玩家列表以及自己玩家虚拟形象头像 拍脚本视频最必用的',
+    Callback = function(state)
+        local player = game:GetService("Players").LocalPlayer
+        local playergui = player:WaitForChild("PlayerGui")
+        local playerinfo = playergui:WaitForChild("TemporaryUI"):WaitForChild("PlayerInfo")
+        if state then
+            if not hideBarConnection then
+                hideBarConnection = game:GetService("RunService").RenderStepped:Connect(function()
+                    local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
+                    if survivors and survivors.Visible then
+                        survivors.Visible = false
+                    end
+                    local icon = playerinfo:FindFirstChild("PlayerIcon")
+                    if icon and icon.Image ~= ("rbxassetid://" .. customIconId) then
+                        icon.Image = "rbxassetid://".. customIconId
+                    end
+                end)
+            end
+        else
+            if hideBarConnection then
+                hideBarConnection:Disconnect()
+                hideBarConnection = nil
+            end
+            local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
+            if survivors then
+                survivors.Visible = true
+            end
+        end
+    end
+})
+
+
+Game:AddDivider()
+
+do
+    local Players = game:GetService("Players")
+    local player = Players.LocalPlayer
+
+    local fakeFixAnim = Instance.new("Animation")
+    fakeFixAnim.AnimationId = "rbxassetid://82691533602949"
+
+    local animator, fakeFixTrack
+
+    local function getAnimator()
+        local char = player.Character
+        if not char then return nil end
+        local humanoid = char:FindFirstChildOfClass("Humanoid") or char:FindFirstChildOfClass("AnimationController")
+        if not humanoid then return nil end
+        local anim = humanoid:FindFirstChildOfClass("Animator")
+        if not anim then
+            anim = Instance.new("Animator")
+            anim.Parent = humanoid
+        end
+        return anim
+    end
+
+
+Game:AddToggle("FakeFixGenerator", {
+        Text = "假修发动机",
+        Default = false,
+        Callback = function(state)
+            animator = getAnimator()
+            if not animator then return end
+
+            if state then
+                if not fakeFixTrack then
+                    local ok, track = pcall(function()
+                        return animator:LoadAnimation(fakeFixAnim)
+                    end)
+                    if ok and track then
+                        fakeFixTrack = track
+                        fakeFixTrack.Looped = true
+                        fakeFixTrack:Play()
+                    end
+                end
+            else
+                if fakeFixTrack then
+                    fakeFixTrack:Stop()
+                    fakeFixTrack = nil
+                end
+            end
+        end
+})
+end
+
+
+
+do
+Game:AddToggle("FakeDieV2", {
+    Text = "假死亡V2",
+    Default = false
+}):OnChanged(function(state)
+    local Players = game:GetService("Players")
+    local RunService = game:GetService("RunService")
+
+    local plr = Players.LocalPlayer
+    local char = plr.Character or plr.CharacterAdded:Wait()
+    local hum = char:WaitForChild("Humanoid")
+
+    if not getgenv().FakeDieData then
+        getgenv().FakeDieData = {track=nil, conn=nil}
+    end
+
+    if state then
+        local anim = Instance.new("Animation")
+        anim.AnimationId = "rbxassetid://118795597134269"
+
+        local track = hum:LoadAnimation(anim)
+        track:Play()
+
+        if track.Length > 0 then
+            track.TimePosition = track.Length * 0.5
+        end
+
+        getgenv().FakeDieData.track = track
+
+        local stopped = false
+        local conn = RunService.Heartbeat:Connect(function()
+            if track.IsPlaying and not stopped and track.Length > 0 then
+                local percent = track.TimePosition / track.Length
+                if percent >= 0.9 then
+                    track:AdjustSpeed(0) -- pause ở 90%
+                    stopped = true
+                    print("假死亡V2: 动作暂停90%")
+                end
+            end
+        end)
+
+        getgenv().FakeDieData.conn = conn
+
+    else
+        local data = getgenv().FakeDieData
+        if data.track then
+            data.track:Stop()
+            data.track = nil
+        end
+        if data.conn then
+            data.conn:Disconnect()
+            data.conn = nil
+        end
+
+        pcall(function()
+            hum:PlayEmote("idle")
+        end)
+    end
+end)
+end
+
+
+
+
+
+
+
 
 
 
@@ -634,40 +814,6 @@ Camera:AddToggle("SpectateKiller", {
     end
 })
 
-Camera:AddToggle('HiddenPlayerColumn', {
-    Text = '隐藏对局玩家列表',
-    Default = false,
-    Tooltip = '隐藏玩家列表及头像图标 拍脚本最必用的',
-    Callback = function(state)
-        local player = game:GetService("Players").LocalPlayer
-        local playergui = player:WaitForChild("PlayerGui")
-        local playerinfo = playergui:WaitForChild("TemporaryUI"):WaitForChild("PlayerInfo")
-        if state then
-            if not hideBarConnection then
-                hideBarConnection = game:GetService("RunService").RenderStepped:Connect(function()
-                    local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
-                    if survivors and survivors.Visible then
-                        survivors.Visible = false
-                    end
-                    local icon = playerinfo:FindFirstChild("PlayerIcon")
-                    if icon and icon.Image ~= ("rbxassetid://95816097006870") then
-                        icon.Image = "rbxassetid://95816097006870"
-                    end
-                end)
-            end
-        else
-            if hideBarConnection then
-                hideBarConnection:Disconnect()
-                hideBarConnection = nil
-            end
-            local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
-            if survivors then
-                survivors.Visible = true
-            end
-        end
-    end
-})
-
 Camera:AddDivider()
 
 Camera:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 到对局内才能生效")
@@ -697,6 +843,7 @@ Camera:AddToggle("StartFov",{
         end)
     end
 })
+
 
 
 
@@ -820,6 +967,16 @@ Teleport:AddButton({
         end)
     end
 })
+
+
+
+
+
+
+
+
+
+
 
 
 
