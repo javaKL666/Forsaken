@@ -64,7 +64,7 @@ local Window = Library:CreateWindow({
 local Tabs = {
     new = Window:AddTab('公告','external-link','公告&信息'),
     Main = Window:AddTab('玩家','user','这是主要的!!!'),
-    Aimbot = Window:AddTab('自瞄','mouse','让你自瞄的更准!!!'),
+    Aimbot = Window:AddTab('自瞄','crosshair','让你自瞄的更准!!!'),
     Esp = Window:AddTab('ESP','scan-eye','让你能够透视他们!!!'),
     NotificationListen = Window:AddTab('通知提示','eye','让你帮助你监听杀手!!!'),
     FightingKilling = Window:AddTab('战斗&杀戮','swords','让变得打击更轻松!!!'),
@@ -127,7 +127,7 @@ function killerAttack()
 end
 
 
-local new = Tabs.new:AddLeftGroupbox('新闻🚀')
+local new = Tabs.new:AddLeftGroupbox('新闻','rocket')
 
 new:AddLabel("[+]开发 JackEyeKL")
 new:AddLabel("支持是我们的最大的贡献💩")
@@ -164,7 +164,7 @@ setclipboard("798979110")
 
 --]]
 
-local Team = Tabs.new:AddRightGroupbox('组织🍏')
+local Team = Tabs.new:AddRightGroupbox('组织','apple')
 
 Team:AddButton({
     Text = "复制 LightStar 企鹅群 ①",
@@ -261,6 +261,8 @@ KillerSurvival:AddToggle("AntiStun", {
         end)
     end
 })
+
+KillerSurvival:AddDivider()
 
 KillerSurvival:AddToggle("AlwaysSprint", {
     Text = "一直保持奔跑状态",
@@ -548,6 +550,7 @@ SM:AddToggle("AutoDagger", {
         end)
     end
 })
+
 SM:AddToggle("DaggerAura", {
     Text = "背刺光环",
     Default = false,
@@ -590,7 +593,7 @@ Game:AddInput('CustomIconInput', {
     Numeric = false,
     Finished = true,
     ClearTextOnFocus = true,
-    Text = '替换玩家虚拟形象图标id',
+    Text = '替换玩家对局虚拟形象图标id',
     Tooltip = '用于替换隐藏时显示的图标',
     Placeholder = '请输入图片id',
     Callback = function(value)
@@ -601,6 +604,22 @@ Game:AddInput('CustomIconInput', {
             Library:Notify("LightStar-提示\n图片更改无效", nil, 4590657391)
         end
     end
+})
+
+Game:AddToggle('ChangeGamePlayerInput', {
+    Text = '替换玩家对局虚拟形象图标',
+    Default = false,
+    Callback = function(state)
+    if state then
+        local player = game:GetService("Players").LocalPlayer
+        local playergui = player:WaitForChild("PlayerGui")
+        local playerinfo = playergui:WaitForChild("TemporaryUI"):WaitForChild("PlayerInfo")
+        local icon = playerinfo:FindFirstChild("PlayerIcon")
+                    if icon and icon.Image ~= ("rbxassetid://" .. customIconId) then
+                        icon.Image = "rbxassetid://".. customIconId
+                    end
+                end
+             end
 })
 
 Game:AddToggle('HiddenGamePlayerColumn', {
@@ -617,13 +636,9 @@ Game:AddToggle('HiddenGamePlayerColumn', {
                     local survivors = playerinfo:FindFirstChild("CurrentSurvivors")
                     if survivors and survivors.Visible then
                         survivors.Visible = false
-                    end
-                    local icon = playerinfo:FindFirstChild("PlayerIcon")
-                    if icon and icon.Image ~= ("rbxassetid://" .. customIconId) then
-                        icon.Image = "rbxassetid://".. customIconId
-                    end
+                        end
                 end)
-            end
+             end
         else
             if hideBarConnection then
                 hideBarConnection:Disconnect()
@@ -636,7 +651,6 @@ Game:AddToggle('HiddenGamePlayerColumn', {
         end
     end
 })
-
 
 Game:AddDivider()
 
@@ -778,8 +792,6 @@ end
 
 
 
-
-
 local MainTabbox = Tabs.Main:AddRightTabbox()
 local Camera = MainTabbox:AddTab("相机")
 
@@ -816,7 +828,7 @@ Camera:AddToggle("SpectateKiller", {
 
 Camera:AddDivider()
 
-Camera:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 到对局内才能生效")
+Camera:AddLabel("<b><font color=\"rgb(0, 0, 255)\">[注意]</font></b> 视野大厅启用 然后到对局生效")
 
 Camera:AddSlider("FovValue",{
     Text = "视野调节",
@@ -967,6 +979,14 @@ Teleport:AddButton({
         end)
     end
 })
+
+
+
+
+
+
+
+
 
 
 
@@ -5292,6 +5312,305 @@ Warning:AddDropdown("WarningColor", {
 
 
 
+local Visual = Tabs.NotificationListen:AddRightGroupbox("Noli监听")
+
+
+
+Visual:AddToggle("NoliTeleportAlert", {
+    Text = "Noli传送提示",
+    Default = false,
+    Callback = function(v)
+        if v then
+            local activeConnections = {}
+            local lastNotifyTime = 0
+            local COOLDOWN = 2
+            local TARGET_SOUND_ID = "rbxassetid://125253972523701"
+
+            local function safeNotify()
+                local currentTime = tick()
+                if currentTime - lastNotifyTime > COOLDOWN then
+                    Library:Notify("LightStar-警告\nNoli正在传送")
+                    lastNotifyTime = currentTime
+                end
+            end
+
+            local function checkSoundPlaying(sound)
+                return sound and sound.IsPlaying or false
+            end
+
+            local function monitorSound(sound)
+                task.spawn(function()
+                    while sound.Parent and checkSoundPlaying(sound) do
+                        safeNotify()
+                        task.wait(COOLDOWN)
+                    end
+                end)
+            end
+
+            local function setupKiller(killer)
+                local humanoidRootPart = killer:WaitForChild("HumanoidRootPart", 5)
+                if humanoidRootPart then
+                   
+                    for _, child in ipairs(humanoidRootPart:GetChildren()) do
+                        if child:IsA("Sound") and child.SoundId == TARGET_SOUND_ID then
+                            monitorSound(child)
+                        end
+                    end
+
+                
+                    local connection = humanoidRootPart.ChildAdded:Connect(function(child)
+                        if child:IsA("Sound") and child.SoundId == TARGET_SOUND_ID then
+                            monitorSound(child)
+                        end
+                    end)
+                    
+                    table.insert(activeConnections, connection)
+                end
+            end
+
+        
+            table.insert(activeConnections, workspace.Players.Killers.ChildAdded:Connect(setupKiller))
+
+          
+            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
+                task.spawn(setupKiller, killer)
+            end
+        else
+           
+            for _, conn in ipairs(activeConnections) do
+                conn:Disconnect()
+            end
+            activeConnections = {}
+        end
+    end
+})
+
+
+Visual:AddToggle("NoliTeleportCancel", {
+    Text = "Noli传送取消提示",
+    Default = false,
+    Callback = function(v)
+        if v then
+            local activeConnections = {}
+            local lastNotifyTime = 0
+            local COOLDOWN = 2 
+            
+            local function checkSound(humanoidRootPart)
+                for _, child in ipairs(humanoidRootPart:GetChildren()) do
+                    if child:IsA("Sound") and child.SoundId == "rbxassetid://9125639499" and child.IsPlaying then
+                        local currentTime = tick()
+                        if currentTime - lastNotifyTime > COOLDOWN then
+                            Library:Notify("LightStar-警告\nNoli取消了传送")
+                            lastNotifyTime = currentTime
+                        end
+                        return true
+                    end
+                end
+                return false
+            end
+
+            local function setupKiller(killer)
+                local humanoidRootPart = killer:WaitForChild("HumanoidRootPart", 5)
+                if humanoidRootPart then
+                    local connection
+                    connection = humanoidRootPart.ChildAdded:Connect(function(child)
+                        if child:IsA("Sound") and child.SoundId == "rbxassetid://9125639499" then
+                            task.spawn(function()
+                                while child.Parent and child.IsPlaying do
+                                    local currentTime = tick()
+                                    if currentTime - lastNotifyTime > COOLDOWN then
+                                        Library:Notify("LightStar-警告\nNoli取消了传送")
+                                        lastNotifyTime = currentTime
+                                    end
+                                    task.wait(0.1)
+                                end
+                            end)
+                        end
+                    end)
+                    
+                    table.insert(activeConnections, connection)
+                    
+                    -- 初始检查
+                    task.spawn(function()
+                        while killer.Parent do
+                            if checkSound(humanoidRootPart) then
+                                task.wait(COOLDOWN)
+                            else
+                                task.wait(0.1)
+                            end
+                        end
+                        connection:Disconnect()
+                    end)
+                end
+            end
+
+            -- 监听新杀手
+            table.insert(activeConnections, workspace.Players.Killers.ChildAdded:Connect(setupKiller))
+            
+            -- 检查现有杀手
+            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
+                task.spawn(setupKiller, killer)
+            end
+        else
+            for _, conn in ipairs(activeConnections) do
+                conn:Disconnect()
+            end
+            activeConnections = {}
+        end
+    end
+})
+
+Visual:AddToggle("NoliMotorSelect", {
+    Text = "Noli电机选择提示",
+    Default = false,
+    Callback = function(v)
+        local soundId = "rbxassetid://124468317999247"
+        local notificationMessage = "LightStar-警告\nNoli正在选择电机"
+        local connections = {}
+        local cooldown = 2 -- 通知冷却时间(秒)
+        local lastNotifyTime = 0
+
+        local function disconnectAll()
+            for _, conn in pairs(connections) do
+                conn:Disconnect()
+            end
+            connections = {}
+        end
+
+        local function safeNotify()
+            local now = os.time()
+            if now - lastNotifyTime >= cooldown then
+                Library:Notify(notificationMessage)
+                lastNotifyTime = now
+            end
+        end
+
+        local function setupSoundListener(humanoidRootPart)
+            local function onChildAdded(child)
+                if child:IsA("Sound") and child.SoundId == soundId then
+                    safeNotify()
+                end
+            end
+
+            local conn = humanoidRootPart.ChildAdded:Connect(onChildAdded)
+            table.insert(connections, conn)
+
+            -- 检查已存在的音频
+            for _, child in ipairs(humanoidRootPart:GetChildren()) do
+                if child:IsA("Sound") and child.SoundId == soundId then
+                    safeNotify()
+                    break
+                end
+            end
+        end
+
+        local function onKillerAdded(killer)
+            local humanoidRootPart = killer:FindFirstChild("HumanoidRootPart") or killer:WaitForChild("HumanoidRootPart", 3)
+            if humanoidRootPart then
+                setupSoundListener(humanoidRootPart)
+            end
+        end
+
+        if v then
+            -- 监听新杀手
+            local mainConn = workspace.Players.Killers.ChildAdded:Connect(onKillerAdded)
+            table.insert(connections, mainConn)
+
+            -- 初始化现有杀手
+            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
+                task.spawn(onKillerAdded, killer)
+            end
+        else
+            disconnectAll()
+        end
+    end
+})
+
+
+
+
+
+Visual:AddToggle("NoliMotorSelect", {
+    Text = "Noli冲刺提示",
+    Default = false,
+    Callback = function(v)
+        local soundId = "rbxassetid://126318185932771"
+        local notificationMessage = "LightStar-警告\nNoli正在冲刺"
+        local endNotificationMessage = "LightStar-警告\nNoli冲刺结束"
+        local connections = {}
+        local cooldown = 2
+        local lastNotifyTime = 0
+
+        local function disconnectAll()
+            for _, conn in pairs(connections) do
+                conn:Disconnect()
+            end
+            connections = {}
+        end
+
+        local function safeNotify(message)
+            local now = os.time()
+            if now - lastNotifyTime >= cooldown then
+                Library:Notify(message)
+                lastNotifyTime = now
+            end
+        end
+
+        local function setupSoundListener(humanoidRootPart)
+            local function onChildAdded(child)
+                if child:IsA("Sound") and child.SoundId == soundId then
+                    safeNotify(notificationMessage)
+                    local endedConn = child.Ended:Connect(function()
+                        safeNotify(endNotificationMessage)
+                        endedConn:Disconnect()
+                    end)
+                    table.insert(connections, endedConn)
+                end
+            end
+
+            local conn = humanoidRootPart.ChildAdded:Connect(onChildAdded)
+            table.insert(connections, conn)
+
+            for _, child in ipairs(humanoidRootPart:GetChildren()) do
+                if child:IsA("Sound") and child.SoundId == soundId then
+                    safeNotify(notificationMessage)
+                    if child.IsPlaying then
+                        local endedConn = child.Ended:Connect(function()
+                            safeNotify(endNotificationMessage)
+                            endedConn:Disconnect()
+                        end)
+                        table.insert(connections, endedConn)
+                    end
+                    break
+                end
+            end
+        end
+
+        local function onKillerAdded(killer)
+            local humanoidRootPart = killer:FindFirstChild("HumanoidRootPart") or killer:WaitForChild("HumanoidRootPart", 3)
+            if humanoidRootPart then
+                setupSoundListener(humanoidRootPart)
+            end
+        end
+
+        if v then
+            local mainConn = workspace.Players.Killers.ChildAdded:Connect(onKillerAdded)
+            table.insert(connections, mainConn)
+            for _, killer in ipairs(workspace.Players.Killers:GetChildren()) do
+                task.spawn(onKillerAdded, killer)
+            end
+        else
+            disconnectAll()
+        end
+    end
+})
+
+
+
+
+
+
+
 
 
 
@@ -8282,7 +8601,7 @@ SM:AddToggle("HitboxSize", {
 
 
 
-local SM = Tabs.FightingKilling:AddRightGroupbox('暴力')
+local SM = Tabs.FightingKilling:AddRightGroupbox('暴力','angry')
 
 local function getASurvivor(dist)
     local char = localPlayer.Character
@@ -8444,20 +8763,22 @@ SM:AddSlider("KillAllmew", {
 
 
 
-local Generator = Tabs.Generator:AddLeftGroupbox("修机")
+local Generator = Tabs.Generator:AddLeftGroupbox("发动机")
 
 Generator:AddDropdown('FixMode', {
-    Values = {'危险模式', '安全模式', '自调模式'},
-    Default = 2,
+    Values = {'危险模式', '评分模式', '安全模式', '自调模式'},
+    Default = 3,
     Multi = false,
     Text = '修机模式',
     Searchable = false,
     Callback = function(v)
         _G.FixMode = v
         if v == "危险模式" then
-            Generator:SetValue("RepairSpeed", 3)
+            Generator:SetValue("RepairSpeed", 1)
         elseif v == "安全模式" then
             Generator:SetValue("RepairSpeed", 5)
+        elseif v == "评分模式" then
+            Generator:SetValue("RepairSpeed", 3)
         end
     end
 })
@@ -8557,6 +8878,37 @@ Generator:AddToggle("AutoStartGenerator", {
     end
 })
 
+Generator:AddButton("TeleportGenerator", {
+    Text = '传送到发电机',
+    Func = function()
+        local player = game.Players.LocalPlayer
+        local character = player.Character
+        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+        
+        local generators = workspace.Map.Ingame.Map:GetChildren()
+        for _, generator in ipairs(generators) do
+            if generator.Name == "Generator" and 
+               generator:FindFirstChild("Progress") and 
+               generator.Progress.Value < 100 then
+                
+                local generatorPart = generator:FindFirstChild("Main") or  
+                                     generator:FindFirstChild("Model") or
+                                     generator:FindFirstChild("Base")
+                
+                if generatorPart then
+                    character.HumanoidRootPart.CFrame = generatorPart.CFrame + Vector3.new(0, 10, 0)
+                    return  
+                end
+            end
+        end
+        warn("没有找到可修理的发电机")
+    end
+})
+
+
+
+
+
 
 
 
@@ -8567,6 +8919,9 @@ Generator:AddToggle("AutoStartGenerator", {
 
     
 
+--[[ 问:为什么要维护传送发动机呢？
+   答:因为有错别 所以正在维护中 我们会推出很好的来做比较
+   
 local TeleportGenerator = Tabs.Generator:AddRightGroupbox('传送')
 
 for a = 1, 5 do
@@ -8595,9 +8950,7 @@ TeleportGenerator:AddButton({
 })
 end
 
-
-
-
+--]]
 
 
 
